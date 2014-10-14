@@ -1,0 +1,13 @@
+Image Class for Dextrous Space
+
+  What is it?
+  -----------
+  
+  A class that provides functionality for images for the project
+  "Dextrous Space". The class implements color images, depth images,
+  and integral images.
+
+  Contacts
+  --------
+
+     o Ralf M. Morawe, Email: r.morawe@hotmail.de
