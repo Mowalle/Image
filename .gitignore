@@ -7,6 +7,7 @@
 *.vsp
 *.tss
 *.dat
+*.jpg
 *.vcxproj.user
 *.nvuser
 *.opensdf
