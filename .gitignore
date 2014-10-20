@@ -8,6 +8,8 @@
 *.tss
 *.dat
 *.jpg
+*.jpeg
+*.png
 *.vcxproj.user
 *.nvuser
 *.opensdf
