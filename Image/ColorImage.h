@@ -30,10 +30,9 @@ private:
 	
 	bool readRaw(const std::string &fileName);
 	bool readBinary(const std::string &fileName);
-	//bool readBinary(int width, int height, unsigned int *bitImg);
 	bool readCV(const std::string &fileName);
 	
-	void				setRGBAOffsets();
+	void setRGBAOffsets();
 };
 
 //	To define methods for this template include source file.

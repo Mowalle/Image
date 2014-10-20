@@ -14,7 +14,7 @@ public:
 	{ };
 	~Image( ) { };
 
-	//virtual bool read(const std::string &filename) = 0;
+	virtual bool read(const std::string &filename) = 0;
 
 	// Getter
 	Type getData() { return m_data; }
@@ -27,7 +27,7 @@ public:
 	void setHeight(int height) { m_height = height; }
 
 protected:
-	Type				m_data;
+	Type*				m_data;
 	int					m_width;
 	int					m_height;
 	int					m_memAllocated;

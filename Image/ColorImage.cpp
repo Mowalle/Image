@@ -3,37 +3,21 @@
 **/
 
 /** ------------------------------------
-*					public
-*	------------------------------------
-**/
-template <typename Type, ColorSpace cs>
-int ColorImage<Type, cs>::getNumChannels() const
-{
-	switch(cs)
-	{
-	case ColorSpace::CS_RGB || ColorSpace CS::HSV:
-		return 3;
-		break;
-	}
-}
-
-
-/** ------------------------------------
 *					private
 *	------------------------------------
 **/
 
 template <typename Type, ColorSpace cs>
-bool ColorImage<Type, cs>::read(const std::string &fileName)
+bool ColorImage<Type, cs>::read( const std::string &fileName )
 {
 	// Create dummy file and check if it was a success before trying to 
 	// read image.
-	FILE *dummy = fopen(fileName.c_str(), "r");
+	FILE *dummy = fopen( fileName.c_str(), "r" );
 
-	if (dummy == nullptr)
+	if ( dummy == nullptr )
 	{
 		// using fileName.c_str(), else the file name would be displayed incorretly.
-		fprintf(stderr, "ERROR: Couldn't open file %s\n", fileName.c_str());
+		fprintf( stderr, "ERROR: Couldn't open file %s\n", fileName.c_str() );
 		return false;
 	}
 
@@ -41,18 +25,18 @@ bool ColorImage<Type, cs>::read(const std::string &fileName)
 
 	bool success;
 	// Look at file name. Differentiate between formats.
-	if (isRawFilename(fileName))
+	if ( isRawFilename( fileName ) )
 	{
-		success = readRaw(fileName);
+		success = readRaw( fileName );
 	}
-	else if (isBinaryFilename(fileName))
+	else if ( isBinaryFilename( fileName ) )
 	{
-		success = readBinary(fileName);
+		success = readBinary( fileName );
 	}
 	else
 	{
 		// Use OpenCV to read image, replacing readCV(fileName, cf)
-		success = readCV(fileName);
+		success = readCV( fileName );
 	}
 
 	return success;

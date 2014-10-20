@@ -12,7 +12,9 @@ int main()
 
 	std::string fileName = "Penguin.jpg";
 
-	img.read(fileName);
+	img.read( fileName );
+
+	std::cout << sizeof( ColorSpace ) << std::endl;
 
 	std::cout << "End of program.";
 	
