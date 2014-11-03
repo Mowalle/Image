@@ -6,13 +6,12 @@ template <typename Type>
 class Image
 {
 public:
+	// Constructor(s)
 	Image( ) 
-	: m_data(0)
-	, m_width(0)
-	, m_height(0)
-	, m_memAllocated(0)
-	{ };
-	~Image( ) { };
+		: m_data(nullptr), m_width(0), m_height(0), m_memAllocated(0)
+	{ std::cout << "Image.h: Image constr." << std::endl; };
+	// De-Constructor(s)
+	~Image( ) { delete [] m_data; std::cout << "Image.h: Image destr." << std::endl; };
 
 	virtual bool read(const std::string &filename) = 0;
 
