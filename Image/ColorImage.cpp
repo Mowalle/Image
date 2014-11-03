@@ -1,11 +1,6 @@
 /**
 *	This file must be excluded from build!
 **/
-#include "ColorImage.h"
-/** ------------------------------------
-*					private
-*	------------------------------------
-**/
 
 template <typename Type, ColorSpace cs>
 bool ColorImage<Type, cs>::read( const std::string &fileName )
@@ -16,7 +11,7 @@ bool ColorImage<Type, cs>::read( const std::string &fileName )
 
 	if ( dummy == nullptr )
 	{
-		fprintf( stderr, "ERROR: Couldn't open of find file %s.\n", fileName.c_str() ); // using fileName.c_str(), else the file name would be displayed incorretly.
+		fprintf( stderr, "ERROR: Couldn't open or find file %s.\n", fileName.c_str() ); // using fileName.c_str(), else the file name would be displayed incorretly.
 		return false;
 	}
 
@@ -44,6 +39,11 @@ bool ColorImage<Type, cs>::read( const std::string &fileName )
 	return success;
 }
 
+/** ------------------------------------
+*					private
+*	------------------------------------
+**/
+
 template <typename Type, ColorSpace cs>
 bool ColorImage<Type, cs>::isFileType( const std::string &fileName , const std::string &fileType) const
 {
@@ -63,12 +63,6 @@ bool ColorImage<Type, cs>::isFileType( const std::string &fileName , const std::
 	}
 
 	return isEqual;
-}
-
-template <typename Type, ColorSpace cs>
-bool ColorImage<Type, cs>::readRaw( const std::string &fileName )
-{
-	return false;
 }
 
 template <typename Type, ColorSpace cs>
@@ -109,16 +103,56 @@ bool ColorImage<Type, cs>::readCV( const std::string &fileName )
 	{
 		reallocateMemory();
 	}
+
+	// TODO: Templated: Parse Image data into array, depending on Type.
+	copyDataFromCV( cvImage );
 	
+	// openCV cv::Mat handles memory autamtically -> no destructor call needed.
+
+	return true;
+}
+
+template <typename Type, ColorSpace cs>
+bool ColorImage<Type, cs>::readRaw( const std::string &fileName )
+{
+	return false;
+}
+
+template <typename Type, ColorSpace cs>
+void ColorImage<Type, cs>::copyDataFromCV( const cv::Mat &cvImage )
+{
 	int numColumns = cvImage.size().width * cvImage.channels();
 	int step = cvImage.step;
 
 	uchar* data = cvImage.data;
-
-	// TODO: Templated: Parse Image data into array, depending on Type.
+	int pixelCount = 0;
 	
-
-	return true;
+	if ( cvImage.channels() == 1 )
+	{
+		for ( int i = 0; i < m_height; ++i )
+		{
+			for ( int j = 0; j < numColumns; ++j )
+			{
+				m_data[pixelCount] = data[j];
+				pixelCount++;
+			}
+			data += step; // next line
+		}
+	}
+	else if ( cvImage.channels() == 3 )
+	{
+		for ( int i = 0; i < m_height; ++i )
+		{
+			for ( int j = 0; j < numColumns; ++j )
+			{
+				m_data[b( pixelCount )] = data[j];
+				m_data[g( pixelCount )] = data[j + 1];
+				m_data[r( pixelCount )] = data[j + 2];
+				pixelCount++;
+			}
+			data += step; // next line
+		}
+	}
 }
 
 template <typename Type, ColorSpace cs>

@@ -6,7 +6,7 @@ int main( int argc, char** argv )
 {
 	std::cout << "Testing image class..." << std::endl;
 
-	ColorImage<unsigned char, ColorSpace::CS_RGBA> img;
+	ColorImage<float, ColorSpace::CS_RGBA> img;
 	
 	std::string fileName = "Test.png";
 
@@ -14,6 +14,7 @@ int main( int argc, char** argv )
 	{
 		std::cout << "File was read successfully!" << std::endl;
 		std::cout << "Image size: " << img.getWidth() << " x " << img.getHeight() << std::endl;
+		std::cout << "Number of Channels: " << img.getNumberOfChannels() << std::endl;
 	}
 	else
 	{

@@ -48,7 +48,6 @@ public:
 	}
 
 	bool read( const std::string &fileName );
-	int getNumberOfChannels() const { return m_numChan; }
 
 	// Accessors
 	// Returns the (n + 1) red-value-index from the image's data
@@ -66,14 +65,19 @@ public:
 	// Returns the (n + 1) value-value-index (blue-value-index) from the image's data
 	int v( int n ) const { return n * m_numChan + m_offsetB; }
 
+	// Getters
+
+	int getNumberOfChannels() const { return m_numChan; }
+
 private:
 
 	bool isFileType( const std::string &fileName, const std::string &fileType ) const;
 	
-	bool readRaw( const std::string &fileName );
 	bool readBinary( const std::string &fileName );
 	bool readCV( const std::string &fileName );
-	
+	bool readRaw( const std::string &fileName );
+
+	void copyDataFromCV( const cv::Mat &cvImage );
 	void reallocateMemory();
 	void setRGBAOffsets();	// TODO: Fix need for this somehow with specialisation
 
