@@ -16,7 +16,7 @@ public:
 	virtual bool read(const std::string &filename) = 0;
 
 	// Getter
-	Type getData() { return m_data; }
+	Type* getData() { return m_data; }
 	int getWidth() { return m_width; }
 	int getHeight() { return m_height; }
 	int getMemAllocated() { return m_memAllocated; }

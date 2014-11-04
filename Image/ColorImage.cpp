@@ -2,40 +2,34 @@
 *	This file must be excluded from build!
 **/
 
+#include <iostream>
+#include <fstream>
+
 template <typename Type, ColorSpace cs>
 bool ColorImage<Type, cs>::read( const std::string &fileName )
 {
 	// Create dummy file and check if it was a success before trying to 
 	// read image.
-	FILE *dummy = fopen( fileName.c_str(), "r" );
 
-	if ( dummy == nullptr )
+	// Opening dummy file to check if it exists at all.
+	// Replaced the old C-directives (may be slower).
+	std::ifstream dummy;
+	dummy.open( fileName );
+
+	if ( !dummy.is_open() )
 	{
-		fprintf( stderr, "ERROR: Couldn't open or find file %s.\n", fileName.c_str() ); // using fileName.c_str(), else the file name would be displayed incorretly.
+		std::cout << "ERROR: Couldn't open or find file " << fileName << ".\n";
 		return false;
 	}
 
-	fclose(dummy);
+	dummy.close();
 
 	bool success;
-	// Look at file name. Differentiate between formats.
-	if ( isFileType( fileName, ".raw" ) )
-	{
-		std::cout << "Trying to open .raw-file..." << std::endl;
-		success = readRaw( fileName );
-	}
-	else if ( isFileType( fileName, ".bin" ) )
-	{
-		std::cout << "Trying to open .bin-file..." << std::endl;
-		success = readBinary( fileName );
-	}
-	else
-	{
-		std::cout << "Trying to open OpenCV-file..." << std::endl;
-		// Use OpenCV to read image, replacing readCV(fileName, cf)
-		success = readCV( fileName );
-	}
-
+	
+	std::cout << "Trying to open OpenCV-file..." << std::endl;
+	// Use OpenCV to read image, replacing readCV(fileName, cf)
+	success = readCV( fileName );
+	
 	return success;
 }
 
@@ -43,33 +37,6 @@ bool ColorImage<Type, cs>::read( const std::string &fileName )
 *					private
 *	------------------------------------
 **/
-
-template <typename Type, ColorSpace cs>
-bool ColorImage<Type, cs>::isFileType( const std::string &fileName , const std::string &fileType) const
-{
-	bool isEqual = false;
-
-	// Get position of extension-point and compare file extensions.
-	std::size_t pos = fileName.find( '.' );
-	
-	// if point was found
-	if ( pos != std::string::npos )
-	{
-		// string::npos indicates all string until end of string filename.
-		if ( fileName.compare ( pos, std::string::npos, fileType ) == 0 )
-		{
-			isEqual = true;
-		}
-	}
-
-	return isEqual;
-}
-
-template <typename Type, ColorSpace cs>
-bool ColorImage<Type, cs>::readBinary( const std::string &fileName )
-{
-	return false;
-}
 
 template <typename Type, ColorSpace cs>
 bool ColorImage<Type, cs>::readCV( const std::string &fileName )
@@ -80,15 +47,15 @@ bool ColorImage<Type, cs>::readCV( const std::string &fileName )
 	// If image wasn't loaded (wrong format, etc.), exit
 	if ( !cvImage.data )
 	{
-		fprintf( stderr, "ERROR: OpenCV failed to load file %s.\n", fileName.c_str() );
+		std::cout << "ERROR: OpenCV failed to load file " << fileName << ".\n";
 		return false;
 	}
 
-	// TODO: Option "Disregard alpha"
+	// TODO: If for example CS_RGB is chosen and image has 4 channels, ignore the alpha.
 	if ( cvImage.channels() != m_numChan )
 	{
-		fprintf( stderr, "ERROR: Image doesn't have compatible number of channels!\n", fileName.c_str() );
-		printf( "Set channels to %i, but loaded image has %i.\n", m_numChan, cvImage.channels() );
+		std::cout << "ERROR: Image doesn't have compatible number of channels!" << std::endl;
+		std::cout << "(Expected " << m_numChan << "channels, but loaded image has " << cvImage.channels() << " channels.)" << std::endl; 
 		return false;
 	}
 
@@ -106,54 +73,20 @@ bool ColorImage<Type, cs>::readCV( const std::string &fileName )
 
 	// TODO: Templated: Parse Image data into array, depending on Type.
 	copyDataFromCV( cvImage );
-	
-	// openCV cv::Mat handles memory autamtically -> no destructor call needed.
 
+	// openCV cv::Mat handles memory autamtically -> no destructor call needed.
 	return true;
 }
 
-template <typename Type, ColorSpace cs>
-bool ColorImage<Type, cs>::readRaw( const std::string &fileName )
-{
-	return false;
-}
 
 template <typename Type, ColorSpace cs>
-void ColorImage<Type, cs>::copyDataFromCV( const cv::Mat &cvImage )
+void ColorImage<Type, cs>::writeCV( const std::string &fileName ) const
 {
-	int numColumns = cvImage.size().width * cvImage.channels();
-	int step = cvImage.step;
-
-	uchar* data = cvImage.data;
-	int pixelCount = 0;
-	
-	if ( cvImage.channels() == 1 )
-	{
-		for ( int i = 0; i < m_height; ++i )
-		{
-			for ( int j = 0; j < numColumns; ++j )
-			{
-				m_data[pixelCount] = data[j];
-				pixelCount++;
-			}
-			data += step; // next line
-		}
-	}
-	else if ( cvImage.channels() == 3 )
-	{
-		for ( int i = 0; i < m_height; ++i )
-		{
-			for ( int j = 0; j < numColumns; ++j )
-			{
-				m_data[b( pixelCount )] = data[j];
-				m_data[g( pixelCount )] = data[j + 1];
-				m_data[r( pixelCount )] = data[j + 2];
-				pixelCount++;
-			}
-			data += step; // next line
-		}
-	}
+	cv::Mat cvImage;
+	Type* data = nullptr;
+	bool writeReady = false;
 }
+
 
 template <typename Type, ColorSpace cs>
 void ColorImage<Type, cs>::reallocateMemory()
@@ -164,7 +97,7 @@ void ColorImage<Type, cs>::reallocateMemory()
 	setRGBAOffsets();
 
 	m_memAllocated = m_numChan * m_width * m_height;
-	printf("Allocated %i\n", m_memAllocated);
+	std::cout << "Allocated " << m_memAllocated << std::endl;
 	m_data = new Type[m_memAllocated];
 }
 
@@ -203,5 +136,143 @@ void ColorImage<Type, cs>::setRGBAOffsets()
 	default:
 		m_offsetR = m_offsetG = m_offsetB = m_offsetA = 0;
 		break;
+	}
+}
+
+template <>
+void ColorImage<float, ColorSpace::CS_GRAY>::copyDataFromCV( const cv::Mat &cvImage )
+{
+	::copyDataFromCV<float, ColorSpace::CS_GRAY>( cvImage, this, (1/255.0f) );
+}
+
+template <>
+void ColorImage<float, ColorSpace::CS_RGB>::copyDataFromCV( const cv::Mat &cvImage )
+{
+	::copyDataFromCV<float, ColorSpace::CS_RGB>( cvImage, this, (1/255.0f) );
+}
+
+template <>
+void ColorImage<float, ColorSpace::CS_HSV>::copyDataFromCV( const cv::Mat &cvImage )
+{
+	::copyDataFromCV<float, ColorSpace::CS_HSV>( cvImage, this, (1/255.0f) );
+}
+
+template <>
+void ColorImage<float, ColorSpace::CS_LAB>::copyDataFromCV( const cv::Mat &cvImage )
+{
+	::copyDataFromCV<float, ColorSpace::CS_LAB>( cvImage, this, (1/255.0f) );
+}
+
+template <>
+void ColorImage<float, ColorSpace::CS_BGR>::copyDataFromCV( const cv::Mat &cvImage )
+{
+	::copyDataFromCV<float, ColorSpace::CS_BGR>( cvImage, this, (1/255.0f) );
+}
+
+template <>
+void ColorImage<float, ColorSpace::CS_RGBA>::copyDataFromCV( const cv::Mat &cvImage )
+{
+	::copyDataFromCV<float, ColorSpace::CS_RGBA>( cvImage, this, (1/255.0f) );
+}
+
+template <>
+void ColorImage<float, ColorSpace::CS_BGRA>::copyDataFromCV( const cv::Mat &cvImage )
+{
+	::copyDataFromCV<float, ColorSpace::CS_BGRA>( cvImage, this, (1/255.0f) );
+}
+
+template <>
+void ColorImage<float, ColorSpace::CS_ARGB>::copyDataFromCV( const cv::Mat &cvImage )
+{
+	::copyDataFromCV<float, ColorSpace::CS_ARGB>( cvImage, this, (1/255.0f) );
+}
+
+template <>
+void ColorImage<unsigned char, ColorSpace::CS_GRAY>::copyDataFromCV( const cv::Mat &cvImage )
+{
+	::copyDataFromCV<unsigned char, ColorSpace::CS_GRAY>( cvImage, this, 1.0f );
+}
+
+template <>
+void ColorImage<unsigned char, ColorSpace::CS_RGB>::copyDataFromCV( const cv::Mat &cvImage )
+{
+	::copyDataFromCV<unsigned char, ColorSpace::CS_RGB>( cvImage, this, 1.0f );
+}
+
+template <>
+void ColorImage<unsigned char, ColorSpace::CS_HSV>::copyDataFromCV( const cv::Mat &cvImage )
+{
+	::copyDataFromCV<unsigned char, ColorSpace::CS_HSV>( cvImage, this, 1.0f );
+}
+
+template <>
+void ColorImage<unsigned char, ColorSpace::CS_LAB>::copyDataFromCV( const cv::Mat &cvImage )
+{
+	::copyDataFromCV<unsigned char, ColorSpace::CS_LAB>( cvImage, this, 1.0f );
+}
+
+template <>
+void ColorImage<unsigned char, ColorSpace::CS_BGR>::copyDataFromCV( const cv::Mat &cvImage )
+{
+	::copyDataFromCV<unsigned char, ColorSpace::CS_BGR>( cvImage, this, 1.0f );
+}
+
+template <>
+void ColorImage<unsigned char, ColorSpace::CS_RGBA>::copyDataFromCV( const cv::Mat &cvImage )
+{
+	::copyDataFromCV<unsigned char, ColorSpace::CS_RGBA>( cvImage, this, 1.0f );
+}
+
+template <>
+void ColorImage<unsigned char, ColorSpace::CS_BGRA>::copyDataFromCV( const cv::Mat &cvImage )
+{
+	::copyDataFromCV<unsigned char, ColorSpace::CS_BGRA>( cvImage, this, 1.0f );
+}
+
+template <>
+void ColorImage<unsigned char, ColorSpace::CS_ARGB>::copyDataFromCV( const cv::Mat &cvImage )
+{
+	::copyDataFromCV<unsigned char, ColorSpace::CS_ARGB>( cvImage, this, 1.0f );
+}
+
+/** ------------------------------------
+*					global
+*	------------------------------------
+**/
+
+template <typename Type, ColorSpace cs>
+void copyDataFromCV( const cv::Mat &cvImage, ColorImage<Type, cs> *clrImage , float scale )
+{
+	int numColumns = cvImage.size().width * cvImage.channels();
+	int step = cvImage.step;
+
+	uchar* data = cvImage.data;
+	int pixelCount = 0;
+
+	if ( cvImage.channels() == 1 )
+	{
+		for ( int i = 0; i < clrImage->getHeight(); ++i )
+		{
+			for ( int j = 0; j < numColumns; ++j )
+			{
+				clrImage->getData()[pixelCount] = data[j];
+				pixelCount++;
+			}
+			data += step; // next line
+		}
+	}
+	else if ( cvImage.channels() == 3 )
+	{
+		for ( int i = 0; i < clrImage->getHeight(); ++i )
+		{
+			for ( int j = 0; j < numColumns; ++j )
+			{
+				clrImage->getData()[clrImage->b( pixelCount )] = data[j] * scale;
+				clrImage->getData()[clrImage->g( pixelCount )] = data[j + 1] * scale;
+				clrImage->getData()[clrImage->r( pixelCount )] = data[j + 2] * scale;
+				pixelCount++;
+			}
+			data += step; // next line
+		}
 	}
 }

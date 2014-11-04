@@ -7,7 +7,7 @@ int main( int argc, char** argv )
 	std::cout << "Testing image class..." << std::endl;
 
 	ColorImage<float, ColorSpace::CS_RGBA> img;
-	
+
 	std::string fileName = "Test.png";
 
 	if ( img.read( fileName ) )
@@ -20,6 +20,8 @@ int main( int argc, char** argv )
 	{
 		std::cout << "File wasn't read!" << std::endl;
 	}
+
+	std::cout << img.getData()[0];
 
 	std::cout << "\n--------------------" << std::endl;
 	std::cout << "End of program." << std::endl;

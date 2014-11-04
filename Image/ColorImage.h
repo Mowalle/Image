@@ -19,11 +19,11 @@ template <typename Type, ColorSpace cs>
 class ColorImage : public Image<Type>
 {
 public:
-	ColorImage() : m_numChan( getNumberOfChannels( cs ) ) {};
-	~ColorImage(){};
+	ColorImage() : m_numChan( getNumberOfChannels( cs ) ) {}
+	~ColorImage(){}
 	
 	// TODO: Fix need for this with specialisation AND move this to the .cpp
-	static int getNumberOfChannels ( ColorSpace colorsp )
+	static int getNumberOfChannels ( const ColorSpace colorsp )
 	{
 		switch ( colorsp )
 		{
@@ -50,6 +50,7 @@ public:
 	bool read( const std::string &fileName );
 
 	// Accessors
+
 	// Returns the (n + 1) red-value-index from the image's data
 	int r( int n ) const { return n * m_numChan + m_offsetR; }
 	// Returns the (n + 1) green-value-index from the image's data
@@ -71,12 +72,11 @@ public:
 
 private:
 
-	bool isFileType( const std::string &fileName, const std::string &fileType ) const;
-	
-	bool readBinary( const std::string &fileName );
 	bool readCV( const std::string &fileName );
-	bool readRaw( const std::string &fileName );
+	void writeCV( const std::string &fileName ) const;
 
+	// This function is fully specialised for each color space.
+	// It calls the global copyDataFromCV function.
 	void copyDataFromCV( const cv::Mat &cvImage );
 	void reallocateMemory();
 	void setRGBAOffsets();	// TODO: Fix need for this somehow with specialisation
@@ -88,6 +88,11 @@ private:
 	unsigned int m_offsetA;
 
 };
+
+// TODO: Make this not global/public
+// Copies the internal OpenCV-data into the ColorImage's internal array.
+template <typename Type, ColorSpace cs>
+void copyDataFromCV( const cv::Mat &cvImage, ColorImage<Type, cs> *clrImage , float scale );
 
 //template <typename Type>
 //class ColorImage<Type, ColorSpace::CS_RGBA> : public Image<Type>
