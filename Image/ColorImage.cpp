@@ -71,22 +71,21 @@ bool ColorImage<Type, cs>::readCV( const std::string &fileName )
 		reallocateMemory();
 	}
 
-	// TODO: Templated: Parse Image data into array, depending on Type.
 	copyDataFromCV( cvImage );
-
 	// openCV cv::Mat handles memory autamtically -> no destructor call needed.
 	return true;
 }
 
-
 template <typename Type, ColorSpace cs>
 void ColorImage<Type, cs>::writeCV( const std::string &fileName ) const
 {
-	cv::Mat cvImage;
 	Type* data = nullptr;
 	bool writeReady = false;
-}
 
+
+
+	cv::Mat cvImage;
+}
 
 template <typename Type, ColorSpace cs>
 void ColorImage<Type, cs>::reallocateMemory()
@@ -142,120 +141,115 @@ void ColorImage<Type, cs>::setRGBAOffsets()
 template <>
 void ColorImage<float, ColorSpace::CS_GRAY>::copyDataFromCV( const cv::Mat &cvImage )
 {
-	::copyDataFromCV<float, ColorSpace::CS_GRAY>( cvImage, this, (1/255.0f) );
+	ColorImage<float, ColorSpace::CS_GRAY>::copyDataFromCVHelper( cvImage, this, (1/255.0f) );
 }
 
 template <>
 void ColorImage<float, ColorSpace::CS_RGB>::copyDataFromCV( const cv::Mat &cvImage )
 {
-	::copyDataFromCV<float, ColorSpace::CS_RGB>( cvImage, this, (1/255.0f) );
+	ColorImage<float, ColorSpace::CS_RGB>::copyDataFromCVHelper( cvImage, this, (1/255.0f) );
 }
 
 template <>
 void ColorImage<float, ColorSpace::CS_HSV>::copyDataFromCV( const cv::Mat &cvImage )
 {
-	::copyDataFromCV<float, ColorSpace::CS_HSV>( cvImage, this, (1/255.0f) );
+	ColorImage<float, ColorSpace::CS_HSV>::copyDataFromCVHelper( cvImage, this, (1/255.0f) );
 }
 
 template <>
 void ColorImage<float, ColorSpace::CS_LAB>::copyDataFromCV( const cv::Mat &cvImage )
 {
-	::copyDataFromCV<float, ColorSpace::CS_LAB>( cvImage, this, (1/255.0f) );
+	ColorImage<float, ColorSpace::CS_LAB>::copyDataFromCVHelper( cvImage, this, (1/255.0f) );
 }
 
 template <>
 void ColorImage<float, ColorSpace::CS_BGR>::copyDataFromCV( const cv::Mat &cvImage )
 {
-	::copyDataFromCV<float, ColorSpace::CS_BGR>( cvImage, this, (1/255.0f) );
+	ColorImage<float, ColorSpace::CS_BGR>::copyDataFromCVHelper( cvImage, this, (1/255.0f) );
 }
 
 template <>
 void ColorImage<float, ColorSpace::CS_RGBA>::copyDataFromCV( const cv::Mat &cvImage )
 {
-	::copyDataFromCV<float, ColorSpace::CS_RGBA>( cvImage, this, (1/255.0f) );
+	ColorImage<float, ColorSpace::CS_RGBA>::copyDataFromCVHelper( cvImage, this, (1/255.0f) );
 }
 
 template <>
 void ColorImage<float, ColorSpace::CS_BGRA>::copyDataFromCV( const cv::Mat &cvImage )
 {
-	::copyDataFromCV<float, ColorSpace::CS_BGRA>( cvImage, this, (1/255.0f) );
+	ColorImage<float, ColorSpace::CS_BGRA>::copyDataFromCVHelper( cvImage, this, (1/255.0f) );
 }
 
 template <>
 void ColorImage<float, ColorSpace::CS_ARGB>::copyDataFromCV( const cv::Mat &cvImage )
 {
-	::copyDataFromCV<float, ColorSpace::CS_ARGB>( cvImage, this, (1/255.0f) );
+	ColorImage<float, ColorSpace::CS_ARGB>::copyDataFromCVHelper( cvImage, this, (1/255.0f) );
 }
 
 template <>
 void ColorImage<unsigned char, ColorSpace::CS_GRAY>::copyDataFromCV( const cv::Mat &cvImage )
 {
-	::copyDataFromCV<unsigned char, ColorSpace::CS_GRAY>( cvImage, this, 1.0f );
+	ColorImage<unsigned char, ColorSpace::CS_GRAY>::copyDataFromCVHelper( cvImage, this, 1.0f );
 }
 
 template <>
 void ColorImage<unsigned char, ColorSpace::CS_RGB>::copyDataFromCV( const cv::Mat &cvImage )
 {
-	::copyDataFromCV<unsigned char, ColorSpace::CS_RGB>( cvImage, this, 1.0f );
+	ColorImage<unsigned char, ColorSpace::CS_RGB>::copyDataFromCVHelper( cvImage, this, 1.0f );
 }
 
 template <>
 void ColorImage<unsigned char, ColorSpace::CS_HSV>::copyDataFromCV( const cv::Mat &cvImage )
 {
-	::copyDataFromCV<unsigned char, ColorSpace::CS_HSV>( cvImage, this, 1.0f );
+	ColorImage<unsigned char, ColorSpace::CS_HSV>::copyDataFromCVHelper( cvImage, this, 1.0f );
 }
 
 template <>
 void ColorImage<unsigned char, ColorSpace::CS_LAB>::copyDataFromCV( const cv::Mat &cvImage )
 {
-	::copyDataFromCV<unsigned char, ColorSpace::CS_LAB>( cvImage, this, 1.0f );
+	ColorImage<unsigned char, ColorSpace::CS_LAB>::copyDataFromCVHelper( cvImage, this, 1.0f );
 }
 
 template <>
 void ColorImage<unsigned char, ColorSpace::CS_BGR>::copyDataFromCV( const cv::Mat &cvImage )
 {
-	::copyDataFromCV<unsigned char, ColorSpace::CS_BGR>( cvImage, this, 1.0f );
+	ColorImage<unsigned char, ColorSpace::CS_BGR>::copyDataFromCVHelper( cvImage, this, 1.0f );
 }
 
 template <>
 void ColorImage<unsigned char, ColorSpace::CS_RGBA>::copyDataFromCV( const cv::Mat &cvImage )
 {
-	::copyDataFromCV<unsigned char, ColorSpace::CS_RGBA>( cvImage, this, 1.0f );
+	ColorImage<unsigned char, ColorSpace::CS_RGBA>::copyDataFromCVHelper( cvImage, this, 1.0f );
 }
 
 template <>
 void ColorImage<unsigned char, ColorSpace::CS_BGRA>::copyDataFromCV( const cv::Mat &cvImage )
 {
-	::copyDataFromCV<unsigned char, ColorSpace::CS_BGRA>( cvImage, this, 1.0f );
+	ColorImage<unsigned char, ColorSpace::CS_BGRA>::copyDataFromCVHelper( cvImage, this, 1.0f );
 }
 
 template <>
 void ColorImage<unsigned char, ColorSpace::CS_ARGB>::copyDataFromCV( const cv::Mat &cvImage )
 {
-	::copyDataFromCV<unsigned char, ColorSpace::CS_ARGB>( cvImage, this, 1.0f );
+	ColorImage<unsigned char, ColorSpace::CS_ARGB>::copyDataFromCVHelper( cvImage, this, 1.0f );
 }
 
-/** ------------------------------------
-*					global
-*	------------------------------------
-**/
-
 template <typename Type, ColorSpace cs>
-void copyDataFromCV( const cv::Mat &cvImage, ColorImage<Type, cs> *clrImage , float scale )
+void ColorImage<Type, cs>::copyDataFromCVHelper( const cv::Mat &cvImage, ColorImage<Type, cs> *clrImage , float scale )
 {
 	int numColumns = cvImage.size().width * cvImage.channels();
 	int step = cvImage.step;
 
-	uchar* data = cvImage.data;
+	unsigned char* data = cvImage.data;
 	int pixelCount = 0;
 
 	if ( cvImage.channels() == 1 )
 	{
-		for ( int i = 0; i < clrImage->getHeight(); ++i )
+		for ( int i = 0; i < m_height; ++i )
 		{
 			for ( int j = 0; j < numColumns; ++j )
 			{
-				clrImage->getData()[pixelCount] = data[j];
+				m_data[pixelCount] = data[j];
 				pixelCount++;
 			}
 			data += step; // next line
@@ -263,13 +257,28 @@ void copyDataFromCV( const cv::Mat &cvImage, ColorImage<Type, cs> *clrImage , fl
 	}
 	else if ( cvImage.channels() == 3 )
 	{
-		for ( int i = 0; i < clrImage->getHeight(); ++i )
+		for ( int i = 0; i < m_height; ++i )
 		{
-			for ( int j = 0; j < numColumns; ++j )
+			for ( int j = 0; j < numColumns; j += cvImage.channels() )
 			{
-				clrImage->getData()[clrImage->b( pixelCount )] = data[j] * scale;
-				clrImage->getData()[clrImage->g( pixelCount )] = data[j + 1] * scale;
-				clrImage->getData()[clrImage->r( pixelCount )] = data[j + 2] * scale;
+				m_data[b( pixelCount )] = data[j] * scale;
+				m_data[g( pixelCount )] = data[j + 1] * scale;
+				m_data[r( pixelCount )] = data[j + 2] * scale;
+				pixelCount++;
+			}
+			data += step; // next line
+		}
+	}
+	else if ( cvImage.channels() == 4 )
+	{
+		for ( int i = 0; i < m_height; ++i )
+		{
+			for ( int j = 0; j < numColumns; j += cvImage.channels() )
+			{
+				m_data[b( pixelCount )] = data[j] * scale;
+				m_data[g( pixelCount )] = data[j + 1] * scale;
+				m_data[r( pixelCount )] = data[j + 2] * scale;
+				m_data[a( pixelCount )] = data[j + 3] * scale;
 				pixelCount++;
 			}
 			data += step; // next line

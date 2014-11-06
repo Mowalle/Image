@@ -75,11 +75,14 @@ private:
 	bool readCV( const std::string &fileName );
 	void writeCV( const std::string &fileName ) const;
 
-	// This function is fully specialised for each color space.
+	// This function is fully specialized for each color space.
 	// It calls the global copyDataFromCV function.
 	void copyDataFromCV( const cv::Mat &cvImage );
+	// HELPER FUNCTION: Specialized copyDataFromCV calls this, with scale depending on specialization
+	void copyDataFromCVHelper( const cv::Mat &cvImage, ColorImage<Type, cs> *clrImage , float scale );
+
 	void reallocateMemory();
-	void setRGBAOffsets();	// TODO: Fix need for this somehow with specialisation
+	void setRGBAOffsets();	// TODO: Fix need for this somehow with specialization
 
 	int			 m_numChan;
 	unsigned int m_offsetR;
@@ -90,9 +93,6 @@ private:
 };
 
 // TODO: Make this not global/public
-// Copies the internal OpenCV-data into the ColorImage's internal array.
-template <typename Type, ColorSpace cs>
-void copyDataFromCV( const cv::Mat &cvImage, ColorImage<Type, cs> *clrImage , float scale );
 
 //template <typename Type>
 //class ColorImage<Type, ColorSpace::CS_RGBA> : public Image<Type>
