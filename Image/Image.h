@@ -25,10 +25,13 @@ public:
 	void setWidth(int width) { m_width = width; }
 	void setHeight(int height) { m_height = height; }
 
+
 protected:
 	Type*				m_data;
 	int					m_width;
 	int					m_height;
 	int					m_memAllocated;
+
+	virtual void reallocateMemory() = 0;
 };
 

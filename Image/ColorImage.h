@@ -22,7 +22,7 @@ public:
 	ColorImage() : m_numChan( getNumberOfChannels( cs ) ) {}
 	~ColorImage(){}
 	
-	// TODO: Fix need for this with specialisation AND move this to the .cpp
+	// TODO: Move this to the .cpp
 	static int getNumberOfChannels ( const ColorSpace colorsp )
 	{
 		switch ( colorsp )
@@ -48,6 +48,7 @@ public:
 	}
 
 	bool read( const std::string &fileName );
+	void write( const std::string &fileName ) const;
 
 	// Accessors
 
@@ -73,13 +74,18 @@ public:
 private:
 
 	bool readCV( const std::string &fileName );
-	void writeCV( const std::string &fileName ) const;
 
 	// This function is fully specialized for each color space.
-	// It calls the global copyDataFromCV function.
+	// Actual implementation inside copyDataFromCVHelper(...).
 	void copyDataFromCV( const cv::Mat &cvImage );
 	// HELPER FUNCTION: Specialized copyDataFromCV calls this, with scale depending on specialization
 	void copyDataFromCVHelper( const cv::Mat &cvImage, ColorImage<Type, cs> *clrImage , float scale );
+	
+	// This function is fully specialized for each color space.
+	// Actual implementation inside copyDataFromCVHelper(...).
+	void writeCV( const std::string &fileName ) const;
+	// HELPER FUNCTION: Specialized writeCV calls this, with scale depending on specialization
+	void writeCVHelper( Type* trgData, float scale ) const;
 
 	void reallocateMemory();
 	void setRGBAOffsets();	// TODO: Fix need for this somehow with specialization
@@ -91,8 +97,6 @@ private:
 	unsigned int m_offsetA;
 
 };
-
-// TODO: Make this not global/public
 
 //template <typename Type>
 //class ColorImage<Type, ColorSpace::CS_RGBA> : public Image<Type>

@@ -1,4 +1,6 @@
 #include "ColorImage.h"
+#include "opencv2/core/core.hpp"
+#include "opencv2/highgui/highgui.hpp"
 
 #include <iostream>
 
@@ -6,7 +8,7 @@ int main( int argc, char** argv )
 {
 	std::cout << "Testing image class..." << std::endl;
 
-	ColorImage<float, ColorSpace::CS_RGBA> img;
+	ColorImage<float, ColorSpace::CS_ARGB> img;
 
 	std::string fileName = "Test.png";
 
@@ -16,11 +18,11 @@ int main( int argc, char** argv )
 		std::cout << "Image size: " << img.getWidth() << " x " << img.getHeight() << std::endl;
 		std::cout << "Number of Channels: " << img.getNumberOfChannels() << std::endl;
 
-		std::cout << "Pixel (11, 0): [" 
-			<< img.getData()[44] * 255 << ", " << img.getData()[45] * 255 << ", "  
-			<< img.getData()[46] * 255 << ", " << img.getData()[47] * 255 << "]"  << std::endl;
+		std::cout << (int) img.getData()[940] << "," << (int) img.getData()[941] << "," << (int) img.getData()[942] << "," << (int) img.getData()[943] << std::endl;
 
-	}
+		img.write( "NewImage.png" );
+
+	} 
 	else
 	{
 		std::cout << "File wasn't read!" << std::endl;
