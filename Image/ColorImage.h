@@ -9,69 +9,62 @@
 #include <opencv2\core\core.hpp>
 #include <opencv2\highgui\highgui.hpp>
 
-/** 
+/**
 *	Defines various color spaces.
 *	Declared outside of class because of template.
 **/
-enum class ColorSpace { CS_GRAY = 0, CS_RGB, CS_HSV, CS_LAB, CS_RGBA, CS_BGRA, CS_ARGB, CS_BGR};
+enum class ColorSpace { CS_GRAY = 0, CS_RGB, CS_HSV, CS_LAB, CS_RGBA, CS_BGRA, CS_ARGB, CS_BGR };
 
-template <typename Type, ColorSpace cs>
-class ColorImage : public Image<Type>
+template <typename FormatT, ColorSpace cs>
+class ColorImage : public Image < FormatT >
 {
 public:
-	ColorImage() : m_numChan( getNumberOfChannels( cs ) ) {}
-	~ColorImage(){}
-	
-	// TODO: Move this to the .cpp
-	static int getNumberOfChannels ( const ColorSpace colorsp )
-	{
-		switch ( colorsp )
-		{
-		case ColorSpace::CS_GRAY:
-			return 1;
-			break;
-		case ColorSpace::CS_RGB:
-		case ColorSpace::CS_HSV:
-		case ColorSpace::CS_LAB:
-		case ColorSpace::CS_BGR:
-			return 3;
-			break;
-		case ColorSpace::CS_BGRA:
-		case ColorSpace::CS_RGBA:
-		case ColorSpace::CS_ARGB:
-			return 4;
-			break;
-		default:
-			return 0;
-			break;
-		}
-	}
+	// Implementing each constructor because C++11 (which features constructor delegation) is only partially implemented in VS2012.
+
+	ColorImage();
+	ColorImage( int width, int height );
+	explicit ColorImage( const std::string& fileName );
+
+	~ColorImage();
+
+	static int getNumberOfChannels( const ColorSpace colorsp );
 
 	bool read( const std::string &fileName );
 	void write( const std::string &fileName ) const;
+	void copy( ColorImage* src ) const;
+
+	template< typename OtherFormatT, ColorSpace OtherClrSpace >
+	void convert( ColorImage<OtherFormatT, OtherClrSpace>* out ) const;
 
 	// Accessors
 
 	// Returns the (n + 1) red-value-index from the image's data
-	int r( int n ) const { return n * m_numChan + m_offsetR; }
+	int R( int n ) const { return n * m_numChan + m_offsetR; }
 	// Returns the (n + 1) green-value-index from the image's data
-	int g( int n ) const { return n * m_numChan + m_offsetG; }
+	int G( int n ) const { return n * m_numChan + m_offsetG; }
 	// Returns the (n + 1) blue-value-index from the image's data
-	int b( int n ) const { return n * m_numChan + m_offsetB; }
+	int B( int n ) const { return n * m_numChan + m_offsetB; }
 	// Returns the (n + 1) alpha-value-index from the image's data
-	int a( int n ) const { return n * m_numChan + m_offsetA; }
+	int A( int n ) const { return n * m_numChan + m_offsetA; }
 	// Returns the (n + 1) hue-value-index (red-value-index) from the image's data
-	int h( int n ) const { return n * m_numChan + m_offsetR; }
+	int H( int n ) const { return n * m_numChan + m_offsetR; }
 	// Returns the (n + 1) saturation-value-index (green-value-index) from the image's data
-	int s( int n ) const { return n * m_numChan + m_offsetG; }
+	int S( int n ) const { return n * m_numChan + m_offsetG; }
 	// Returns the (n + 1) value-value-index (blue-value-index) from the image's data
-	int v( int n ) const { return n * m_numChan + m_offsetB; }
+	int V( int n ) const { return n * m_numChan + m_offsetB; }
 
 	// Getters
 
 	int getNumberOfChannels() const { return m_numChan; }
+	unsigned int getOffsetR() const { return m_offsetR; }
+	unsigned int getOffsetG() const { return m_offsetG; }
+	unsigned int getOffsetB() const { return m_offsetB; }
+	unsigned int getOffsetA() const { return m_offsetA; }
 
 private:
+
+	ColorImage& operator = ( const ColorImage& rhs );
+	ColorImage( const ColorImage& other );
 
 	bool readCV( const std::string &fileName );
 
@@ -79,15 +72,42 @@ private:
 	// Actual implementation inside copyDataFromCVHelper(...).
 	void copyDataFromCV( const cv::Mat &cvImage );
 	// HELPER FUNCTION: Specialized copyDataFromCV calls this, with scale depending on specialization
-	void copyDataFromCVHelper( const cv::Mat &cvImage, ColorImage<Type, cs> *clrImage , float scale );
-	
+	void copyDataFromCVHelper( const cv::Mat &cvImage, ColorImage<FormatT, cs> *clrImage, float scale );
+
 	// This function is fully specialized for each color space.
 	// Actual implementation inside copyDataFromCVHelper(...).
 	void writeCV( const std::string &fileName ) const;
 	// HELPER FUNCTION: Specialized writeCV calls this, with scale depending on specialization
-	void writeCVHelper( Type* trgData, float scale ) const;
+	void writeCVHelper( FormatT* trgData, float scale ) const;
 
-	void reallocateMemory();
+	// Generic convert, not actually used (does not have definition),
+	// but needed for specialized convert(...)
+	template < typename G, typename OtherFormatT, ColorSpace OtherClrSpace >
+	void convertImpl( const G&,
+		ColorImage< OtherFormatT, OtherClrSpace>* out ) const;
+
+	template < typename OtherFormatT, ColorSpace OtherClrSpace >			  // float -> OtherT, for generic Types and float -> float conversion.
+	void convertImpl( float,
+		ColorImage< OtherFormatT, OtherClrSpace>* out ) const;
+
+	template < typename OtherFormatT, ColorSpace OtherClrSpace >			  // unsigned char -> OtherT, for generic Types and unsigned char -> unsigned char conversion.
+	void convertImpl( unsigned char,
+		ColorImage< OtherFormatT, OtherClrSpace>* out ) const;
+
+	template < ColorSpace OtherClrSpace >			  // float -> unsinged char conversion. Needs to apply factor 255 to values.
+	void convertImpl( float,
+		ColorImage< unsigned char, OtherClrSpace>* out ) const;
+
+	template < ColorSpace OtherClrSpace >			  // unsigned char -> float conversion. Needs to apply factor (1/255) to values.
+	void convertImpl( unsigned char,
+		ColorImage< float, OtherClrSpace>* out ) const;
+
+	template < typename OtherFormatT, ColorSpace OtherClrSpace >
+	void convertWithScale( ColorImage< OtherFormatT, OtherClrSpace>* out,
+		OtherFormatT scale, OtherFormatT maxValue ) const;
+
+	void reallocateMemory() { reallocateMemory( m_width, m_height, m_numChan); }
+	void reallocateMemory( int width, int height, int numChan );
 	void setRGBAOffsets();	// TODO: Fix need for this somehow with specialization
 
 	int			 m_numChan;
@@ -98,13 +118,6 @@ private:
 
 };
 
-//template <typename Type>
-//class ColorImage<Type, ColorSpace::CS_RGBA> : public Image<Type>
-//{
-//public:
-//	bool read( const std::string &fileName ) {return false;};
-//};
-
 //	To define methods for this template include source file.
 //	Must be excluded from project/ignored.
-#include "ColorImage.cpp"
+#include "ColorImage.hh"

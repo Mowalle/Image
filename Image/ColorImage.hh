@@ -5,8 +5,60 @@
 #include <iostream>
 #include <fstream>
 
-template <typename Type, ColorSpace cs>
-bool ColorImage<Type, cs>::read( const std::string &fileName )
+template<typename FormatT, ColorSpace cs>
+ColorImage<FormatT, cs>::ColorImage()
+	: m_numChan( getNumberOfChannels( cs ) )
+{
+	setRGBAOffsets();
+}
+
+template<typename FormatT, ColorSpace cs>
+ColorImage<FormatT, cs>::ColorImage( int width, int height ) 
+	: Image( width, height ), m_numChan( getNumberOfChannels( cs ) ) 
+{ 
+	reallocateMemory(); 
+}
+
+template<typename FormatT, ColorSpace cs>
+ColorImage<FormatT, cs>::ColorImage( const std::string& fileName )
+	: m_numChan( getNumberOfChannels( cs ) )
+{
+	read( fileName );
+}
+
+template<typename FormatT, ColorSpace cs>
+ColorImage<FormatT, cs>::~ColorImage()
+{
+	std::cout << "ColorImage destructor" << std::endl;
+}
+
+template< typename FormatT, ColorSpace cs>
+int ColorImage<FormatT, cs>::getNumberOfChannels( const ColorSpace colorsp )
+{
+	switch ( colorsp )
+	{
+	case ColorSpace::CS_GRAY:
+		return 1;
+		break;
+	case ColorSpace::CS_RGB:
+	case ColorSpace::CS_HSV:
+	case ColorSpace::CS_LAB:
+	case ColorSpace::CS_BGR:
+		return 3;
+		break;
+	case ColorSpace::CS_BGRA:
+	case ColorSpace::CS_RGBA:
+	case ColorSpace::CS_ARGB:
+		return 4;
+		break;
+	default:
+		return 0;
+		break;
+	}
+}
+
+template <typename FormatT, ColorSpace cs>
+bool ColorImage<FormatT, cs>::read( const std::string &fileName )
 {
 	// Create dummy file and check if it was a success before trying to 
 	// read image.
@@ -33,10 +85,35 @@ bool ColorImage<Type, cs>::read( const std::string &fileName )
 	return success;
 }
 
-template <typename Type, ColorSpace cs>
-void ColorImage<Type, cs>::write( const std::string &fileName ) const
+template <typename FormatT, ColorSpace cs>
+void ColorImage<FormatT, cs>::write( const std::string &fileName ) const
 {
 	writeCV( fileName );
+}
+
+template <typename FormatT, ColorSpace cs>
+void ColorImage<FormatT, cs>::copy( ColorImage* dst ) const
+{
+	// Check for dimensions
+	if ( ( m_width == dst->m_width ) && ( m_height == dst->m_height ) && ( m_numChan == dst->m_numChan ) )
+	{
+		for ( int i = 0; i < m_memAllocated; ++i )
+		{
+			dst->m_data[i] = m_data[i];
+		}
+	}
+	else // TODO: What if not compatible
+	{
+
+	}
+}
+
+template< typename FormatT, ColorSpace cs >
+template< typename OtherFormatT, ColorSpace OtherClrSpace >
+void ColorImage< FormatT, cs >
+::convert( ColorImage< OtherFormatT, OtherClrSpace>* out ) const
+{
+	convertImpl( FormatT(), out );
 }
 
 /** ------------------------------------
@@ -44,8 +121,8 @@ void ColorImage<Type, cs>::write( const std::string &fileName ) const
 *	------------------------------------
 **/
 
-template <typename Type, ColorSpace cs>
-bool ColorImage<Type, cs>::readCV( const std::string &fileName )
+template <typename FormatT, ColorSpace cs>
+bool ColorImage<FormatT, cs>::readCV( const std::string &fileName )
 {
 	// Load image
 	cv::Mat cvImage = cv::imread( fileName, cv::IMREAD_UNCHANGED);
@@ -69,11 +146,8 @@ bool ColorImage<Type, cs>::readCV( const std::string &fileName )
 	m_height = cvImage.size().height;
 
 	// If needed memory exceeds already allocated memory
-	if ( ( cvImage.channels() * cvImage.size().width * cvImage.size().height > m_memAllocated ) )
-	{
-		reallocateMemory();
-	}
-
+	reallocateMemory( cvImage.size().width, cvImage.size().height, cvImage.channels() );
+	
 	copyDataFromCV( cvImage );
 	// openCV cv::Mat handles memory autamtically -> no destructor call needed.
 	return true;
@@ -175,11 +249,11 @@ void ColorImage<unsigned char, ColorSpace::CS_ARGB>::copyDataFromCV( const cv::M
 	ColorImage<unsigned char, ColorSpace::CS_ARGB>::copyDataFromCVHelper( cvImage, this, 1.0f );
 }
 
-template <typename Type, ColorSpace cs>
-void ColorImage<Type, cs>::copyDataFromCVHelper( const cv::Mat &cvImage, ColorImage<Type, cs> *clrImage , float scale )
+template <typename FormatT, ColorSpace cs>
+void ColorImage<FormatT, cs>::copyDataFromCVHelper( const cv::Mat &cvImage, ColorImage<FormatT, cs> *clrImage , float scale )
 {
 	int numColumns = cvImage.size().width * cvImage.channels();
-	int step = cvImage.step;
+	int step = (int) cvImage.step;
 
 	unsigned char* data = cvImage.data;
 	int pixelCount = 0;
@@ -190,7 +264,7 @@ void ColorImage<Type, cs>::copyDataFromCVHelper( const cv::Mat &cvImage, ColorIm
 		{
 			for ( int j = 0; j < numColumns; ++j )
 			{
-				m_data[pixelCount] = data[j];
+				m_data[pixelCount] = data[j] * scale;
 				pixelCount++;
 			}
 			data += step; // next line
@@ -202,9 +276,9 @@ void ColorImage<Type, cs>::copyDataFromCVHelper( const cv::Mat &cvImage, ColorIm
 		{
 			for ( int j = 0; j < numColumns; j += cvImage.channels() )
 			{
-				m_data[b( pixelCount )] = data[j] * scale;
-				m_data[g( pixelCount )] = data[j + 1] * scale;
-				m_data[r( pixelCount )] = data[j + 2] * scale;
+				m_data[B( pixelCount )] = data[j] * scale;
+				m_data[G( pixelCount )] = data[j + 1] * scale;
+				m_data[R( pixelCount )] = data[j + 2] * scale;
 				pixelCount++;
 			}
 			data += step; // next line
@@ -216,10 +290,10 @@ void ColorImage<Type, cs>::copyDataFromCVHelper( const cv::Mat &cvImage, ColorIm
 		{
 			for ( int j = 0; j < numColumns; j += cvImage.channels() )
 			{
-				m_data[b( pixelCount )] = data[j] * scale;
-				m_data[g( pixelCount )] = data[j + 1] * scale;
-				m_data[r( pixelCount )] = data[j + 2] * scale;
-				m_data[a( pixelCount )] = data[j + 3] * scale;
+				m_data[B( pixelCount )] = data[j] * scale;
+				m_data[G( pixelCount )] = data[j + 1] * scale;
+				m_data[R( pixelCount )] = data[j + 2] * scale;
+				m_data[A( pixelCount )] = data[j + 3] * scale;
 				pixelCount++;
 			}
 			data += step; // next line
@@ -419,10 +493,9 @@ void ColorImage<unsigned char, ColorSpace::CS_ARGB>::writeCV( const std::string&
 	delete [] tmp;
 }
 
-template <typename Type, ColorSpace cs>
-void ColorImage<Type, cs>::writeCVHelper( Type* trgData , const float scale ) const
+template <typename FormatT, ColorSpace cs>
+void ColorImage<FormatT, cs>::writeCVHelper( FormatT* trgData , const float scale ) const
 {
-	// TODO: Account for different ColorSpace (XYZ/XYZA -> BGR/BGRA)
 	if ( m_numChan == 1 )
 	{
 		for ( int i = 0; i < m_memAllocated; ++i )
@@ -451,22 +524,173 @@ void ColorImage<Type, cs>::writeCVHelper( Type* trgData , const float scale ) co
 	}
 }
 
-template <typename Type, ColorSpace cs>
-void ColorImage<Type, cs>::reallocateMemory()
+template< typename FormatT, ColorSpace cs >
+template< typename OtherFormatT, ColorSpace OtherClrSpace >
+void ColorImage< FormatT, cs>
+::convertImpl( float, ColorImage< OtherFormatT, OtherClrSpace>* out ) const
 {
-	delete [] m_data;
-	m_data = nullptr;
+	convertWithScale( out, 1.0f, 1.0f);
+}
 
-	setRGBAOffsets();
+template< typename FormatT, ColorSpace cs >
+template< typename OtherFormatT, ColorSpace OtherClrSpace >
+void ColorImage< FormatT, cs>
+::convertImpl( unsigned char, ColorImage< OtherFormatT, OtherClrSpace>* out ) const
+{
+	convertWithScale( out, 1.0f, 255 );
+}
 
-	m_memAllocated = m_numChan * m_width * m_height;
-	std::cout << "Allocated " << m_memAllocated << std::endl;
-	m_data = new Type[m_memAllocated];
+template< typename FormatT, ColorSpace cs >
+template< ColorSpace OtherClrSpace >
+void ColorImage< FormatT, cs>
+::convertImpl( float, ColorImage< unsigned char, OtherClrSpace>* out ) const
+{
+	convertWithScale( out, 255, 255 );
+}
+
+template< typename FormatT, ColorSpace cs >
+template< ColorSpace OtherClrSpace >
+void ColorImage< FormatT, cs>
+::convertImpl( unsigned char, ColorImage< float, OtherClrSpace>* out ) const
+{
+	convertWithScale( out, ( 1/255.0f ), 1.0f );
+}
+
+template< typename FormatT, ColorSpace cs >
+template< typename OtherFormatT, ColorSpace OtherClrSpace >
+void ColorImage<FormatT, cs>::convertWithScale( ColorImage< OtherFormatT, OtherClrSpace>* out,
+	OtherFormatT scale, OtherFormatT maxValue ) const
+{
+	int outNumChan = out->getNumberOfChannels();
+	int outMemAllocated = out->getMemAllocated();
+
+	delete[] out->getData();
+
+	OtherFormatT* data = new OtherFormatT[outMemAllocated];
+
+	// Case 1: If both images have same number of channels
+	if ( m_numChan == outNumChan )
+	{
+		if ( outNumChan == 1 ) // if grey iamge, copy value with specialized scale
+		{
+			for ( int i = 0; i < outMemAllocated; ++i )
+			{
+				data[i] = m_data[i] * scale;
+			}
+		}
+		else // if 3 or 4 channels, copy to respective channel with specialized scale.
+		{
+			for ( int i = 0; i < outMemAllocated; i += outNumChan )
+			{
+				data[i + out->getOffsetB()] = m_data[i + m_offsetB] * scale;
+				data[i + out->getOffsetG()] = m_data[i + m_offsetG] * scale;
+				data[i + out->getOffsetR()] = m_data[i + m_offsetR] * scale;
+				if ( outNumChan == 4 ) // if fourth channel (alpha) is present
+				{
+					data[i + out->getOffsetA()] = m_data[i + m_offsetA] * scale;
+				}
+			}
+		}
+	}
+	// Case 2: input image has more channels
+	else if ( m_numChan > outNumChan )
+	{
+		// input image shall be converted to grey image
+		if ( ( m_numChan == 3 || m_numChan == 4 ) && outNumChan == 1 )
+		{
+			int pixelOffset = 0;
+			// average color value
+			float averageColor = 0;
+
+			for ( int i = 0; i < outMemAllocated; ++i )
+			{
+				// Calculate average color value and assign it.
+				// TODO: Other weights (luminosity etc.) instead of just average color.
+				averageColor = (
+					m_data[pixelOffset + m_offsetB] +
+					m_data[pixelOffset + m_offsetG] +
+					m_data[pixelOffset + m_offsetR] ) / 3;
+				data[i] = averageColor * scale;
+
+				pixelOffset += m_numChan;
+			}
+		}
+		// input image shall be converted to image without alpha
+		else if ( m_numChan == 4 && outNumChan == 3 )
+		{
+			int pixelOffset = 0;
+			for ( int i = 0; i < outMemAllocated; i += outNumChan )
+			{
+				data[i + out->getOffsetB()] = m_data[pixelOffset + m_offsetB] * scale;
+				data[i + out->getOffsetG()] = m_data[pixelOffset + m_offsetG] * scale;
+				data[i + out->getOffsetR()] = m_data[pixelOffset + m_offsetR] * scale;
+
+				pixelOffset += m_numChan;
+			}
+		}
+	}
+	// Case 3 : input image has less channels
+	else if ( m_numChan < outNumChan )
+	{
+		// Grey image shall be converted into image with 3/4 channels.
+		if ( m_numChan == 1 && ( outNumChan == 3 || outNumChan == 4 ) )
+		{
+			int pixelOffset = 0;
+			for ( int i = 0; i < outMemAllocated; i += outNumChan )
+			{
+				data[i + out->getOffsetB()] = m_data[pixelOffset] * scale;
+				data[i + out->getOffsetG()] = m_data[pixelOffset] * scale;
+				data[i + out->getOffsetR()] = m_data[pixelOffset] * scale;
+				// if output image has alpha channel
+				if ( outNumChan == 4 )
+				{
+					data[i + out->getOffsetA()] = maxValue;
+				}
+
+				++pixelOffset;
+			}
+		}
+		else if ( m_numChan == 3 && outNumChan == 4 )
+		{
+			int pixelOffset = 0;
+			for ( int i = 0; i < outMemAllocated; i += outNumChan )
+			{
+				data[i + out->getOffsetB()] = m_data[pixelOffset + m_offsetB] * scale;
+				data[i + out->getOffsetG()] = m_data[pixelOffset + m_offsetG] * scale;
+				data[i + out->getOffsetR()] = m_data[pixelOffset + m_offsetR] * scale;
+				data[i + out->getOffsetA()] = maxValue;
+
+				pixelOffset += m_numChan;
+			}
+		}
+	}
+}
+
+template <typename FormatT, ColorSpace cs>
+void ColorImage<FormatT, cs>::reallocateMemory( int width, int height, int numChan )
+{
+	int memNeeded = width * height * numChan;
+
+	if ( m_memAllocated < memNeeded )
+	{
+		delete[] m_data;
+		m_data = nullptr;
+
+		setRGBAOffsets();
+
+		m_memAllocated = m_numChan * m_width * m_height;
+		std::cout << "Reallocated " << m_memAllocated << std::endl;
+		m_data = new FormatT[m_memAllocated];
+	}
+	else
+	{
+		std::cout << "No need to reallocate." << std::endl;
+	}
 }
 
 
-template <typename Type, ColorSpace cs>
-void ColorImage<Type, cs>::setRGBAOffsets()
+template <typename FormatT, ColorSpace cs>
+void ColorImage<FormatT, cs>::setRGBAOffsets()
 {
 	switch ( cs )
 	{

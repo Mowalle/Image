@@ -8,26 +8,19 @@ int main( int argc, char** argv )
 {
 	std::cout << "Testing image class..." << std::endl;
 
-	ColorImage<float, ColorSpace::CS_ARGB> img;
+	ColorImage<unsigned char, ColorSpace::CS_RGBA> img( "Test.png" );
+	ColorImage<float, ColorSpace::CS_HSV> img2( 64, 32 );
+	ColorImage<float, ColorSpace::CS_GRAY> img3( 64, 32 );
 
-	std::string fileName = "Test.png";
 
-	if ( img.read( fileName ) )
-	{
-		std::cout << "File was read successfully!" << std::endl;
-		std::cout << "Image size: " << img.getWidth() << " x " << img.getHeight() << std::endl;
-		std::cout << "Number of Channels: " << img.getNumberOfChannels() << std::endl;
+	//img.copy( &img2 );
+	img.convert( &img2 );
+	img2.convert( &img3 );
 
-		std::cout << (int) img.getData()[940] << "," << (int) img.getData()[941] << "," << (int) img.getData()[942] << "," << (int) img.getData()[943] << std::endl;
 
-		img.write( "NewImage.png" );
-
-	} 
-	else
-	{
-		std::cout << "File wasn't read!" << std::endl;
-	}
-
+	img.write( "NewImage1.png" );
+	img2.write( "NewImage2.png" );
+	img3.write( "NewImage3.png" );
 	std::cout << "\n--------------------" << std::endl;
 	std::cout << "End of program." << std::endl;
 	

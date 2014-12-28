@@ -32,16 +32,16 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ColorImage.cpp">
+    <ClCompile Include="ColorImage.hh">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Image.cpp">
+    <ClCompile Include="DepthImage.hh">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="DepthImage.cpp">
+    <ClCompile Include="Image.hh">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="IntegralImage.cpp">
+    <ClCompile Include="IntegralImage.hh">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
