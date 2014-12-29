@@ -60,7 +60,7 @@ public:
 	unsigned int getOffsetG() const { return m_offsetG; }
 	unsigned int getOffsetB() const { return m_offsetB; }
 	unsigned int getOffsetA() const { return m_offsetA; }
-
+	
 private:
 
 	ColorImage& operator = ( const ColorImage& rhs );
@@ -70,41 +70,9 @@ private:
 
 	// This function is fully specialized for each color space.
 	// Actual implementation inside copyDataFromCVHelper(...).
-	void copyDataFromCV( const cv::Mat &cvImage );
-	// HELPER FUNCTION: Specialized copyDataFromCV calls this, with scale depending on specialization
-	void copyDataFromCVHelper( const cv::Mat &cvImage, ColorImage<FormatT, cs> *clrImage, float scale );
-
-	// This function is fully specialized for each color space.
-	// Actual implementation inside copyDataFromCVHelper(...).
 	void writeCV( const std::string &fileName ) const;
 	// HELPER FUNCTION: Specialized writeCV calls this, with scale depending on specialization
 	void writeCVHelper( FormatT* trgData, float scale ) const;
-
-	// Generic convert, not actually used (does not have definition),
-	// but needed for specialized convert(...)
-	template < typename G, typename OtherFormatT, ColorSpace OtherClrSpace >
-	void convertImpl( const G&,
-		ColorImage< OtherFormatT, OtherClrSpace>* out ) const;
-
-	template < typename OtherFormatT, ColorSpace OtherClrSpace >			  // float -> OtherT, for generic Types and float -> float conversion.
-	void convertImpl( float,
-		ColorImage< OtherFormatT, OtherClrSpace>* out ) const;
-
-	template < typename OtherFormatT, ColorSpace OtherClrSpace >			  // unsigned char -> OtherT, for generic Types and unsigned char -> unsigned char conversion.
-	void convertImpl( unsigned char,
-		ColorImage< OtherFormatT, OtherClrSpace>* out ) const;
-
-	template < ColorSpace OtherClrSpace >			  // float -> unsinged char conversion. Needs to apply factor 255 to values.
-	void convertImpl( float,
-		ColorImage< unsigned char, OtherClrSpace>* out ) const;
-
-	template < ColorSpace OtherClrSpace >			  // unsigned char -> float conversion. Needs to apply factor (1/255) to values.
-	void convertImpl( unsigned char,
-		ColorImage< float, OtherClrSpace>* out ) const;
-
-	template < typename OtherFormatT, ColorSpace OtherClrSpace >
-	void convertWithScale( ColorImage< OtherFormatT, OtherClrSpace>* out,
-		OtherFormatT scale, OtherFormatT maxValue ) const;
 
 	void reallocateMemory() { reallocateMemory( m_width, m_height, m_numChan); }
 	void reallocateMemory( int width, int height, int numChan );

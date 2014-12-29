@@ -17,7 +17,6 @@ int main( int argc, char** argv )
 	img.convert( &img2 );
 	img2.convert( &img3 );
 
-
 	img.write( "NewImage1.png" );
 	img2.write( "NewImage2.png" );
 	img3.write( "NewImage3.png" );
