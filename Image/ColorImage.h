@@ -66,13 +66,10 @@ private:
 	ColorImage& operator = ( const ColorImage& rhs );
 	ColorImage( const ColorImage& other );
 
-	bool readCV( const std::string &fileName );
+	bool readCV( const std::string& fileName );
 
-	// This function is fully specialized for each color space.
-	// Actual implementation inside copyDataFromCVHelper(...).
-	void writeCV( const std::string &fileName ) const;
-	// HELPER FUNCTION: Specialized writeCV calls this, with scale depending on specialization
-	void writeCVHelper( FormatT* trgData, float scale ) const;
+	void writeCV( const std::string& fileName ) const;
+	void writeCVHelper( const std::string& fileName, FormatT tmp[] ) const;
 
 	void reallocateMemory() { reallocateMemory( m_width, m_height, m_numChan); }
 	void reallocateMemory( int width, int height, int numChan );

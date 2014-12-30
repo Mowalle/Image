@@ -292,227 +292,131 @@ bool ColorImage<FormatT, cs>::readCV( const std::string &fileName )
 	return true;
 }
 
-template <>
-void ColorImage<float, ColorSpace::CS_GRAY>::writeCV( const std::string& fileName ) const
+template< typename FormatT, ColorSpace ClrSpace>
+void ColorImage<FormatT, ClrSpace>::writeCV( const std::string& fileName ) const
 {
-	float* tmp = new float[m_memAllocated];
+	FormatT* trgData = new FormatT[m_memAllocated];
 
-	ColorImage<float, ColorSpace::CS_GRAY>::writeCVHelper( tmp, 255.0f );
-
-	cv::imwrite( fileName, cv::Mat( m_height, m_width, CV_32FC1, tmp ) );
-
-	delete [] tmp;
-}
-
-template <>
-void ColorImage<float, ColorSpace::CS_RGB>::writeCV( const std::string& fileName ) const
-{
-	float* tmp = new float[m_memAllocated];
-
-	ColorImage<float, ColorSpace::CS_RGB>::writeCVHelper( tmp, 255.0f );
-
-	cv::imwrite( fileName, cv::Mat( m_height, m_width, CV_32FC3, tmp ) );
-
-	delete [] tmp;
-}
-
-template <>
-void ColorImage<float, ColorSpace::CS_HSV>::writeCV( const std::string& fileName ) const
-{
-	float* tmp = new float[m_memAllocated];
-
-	ColorImage<float, ColorSpace::CS_HSV>::writeCVHelper( tmp, 255.0f );
-
-	cv::imwrite( fileName, cv::Mat( m_height, m_width, CV_32FC3, tmp ) );
-
-	delete [] tmp;
-}
-
-template <>
-void ColorImage<float, ColorSpace::CS_LAB>::writeCV( const std::string& fileName ) const
-{
-	float* tmp = new float[m_memAllocated];
-
-	ColorImage<float, ColorSpace::CS_LAB>::writeCVHelper( tmp, 255.0f );
-
-	cv::imwrite( fileName, cv::Mat( m_height, m_width, CV_32FC3, tmp ) );
-
-	delete [] tmp;
-}
-
-template <>
-void ColorImage<float, ColorSpace::CS_BGR>::writeCV( const std::string& fileName ) const
-{
-	float* tmp = new float[m_memAllocated];
-
-	ColorImage<float, ColorSpace::CS_BGR>::writeCVHelper( tmp, 255.0f );
-
-	cv::imwrite( fileName, cv::Mat( m_height, m_width, CV_32FC3, tmp ) );
-
-	delete [] tmp;
-}
-
-template <>
-void ColorImage<float, ColorSpace::CS_RGBA>::writeCV( const std::string& fileName ) const
-{
-	float* tmp = new float[m_memAllocated];
-
-	ColorImage<float, ColorSpace::CS_RGBA>::writeCVHelper( tmp, 255.0f );
-
-	cv::imwrite( fileName, cv::Mat( m_height, m_width, CV_32FC4, tmp ) );
-
-	delete [] tmp;
-}
-
-template <>
-void ColorImage<float, ColorSpace::CS_BGRA>::writeCV( const std::string& fileName ) const
-{
-	float* tmp = new float[m_memAllocated];
-
-	ColorImage<float, ColorSpace::CS_BGRA>::writeCVHelper( tmp, 255.0f );
-
-	cv::imwrite( fileName, cv::Mat( m_height, m_width, CV_32FC4, tmp ) );
-
-	delete [] tmp;
-}
-
-template <>
-void ColorImage<float, ColorSpace::CS_ARGB>::writeCV( const std::string& fileName ) const
-{
-	float* tmp = new float[m_memAllocated];
-
-	ColorImage<float, ColorSpace::CS_ARGB>::writeCVHelper( tmp, 255.0f );
-
-	cv::imwrite( fileName, cv::Mat( m_height, m_width, CV_32FC4, tmp ) );
-
-	delete [] tmp;
-}
-
-template <>
-void ColorImage<unsigned char, ColorSpace::CS_GRAY>::writeCV( const std::string& fileName ) const
-{
-	unsigned char* tmp = new unsigned char[m_memAllocated];
-
-	ColorImage<unsigned char, ColorSpace::CS_GRAY>::writeCVHelper( tmp, 1.0f );
-
-	cv::imwrite( fileName, cv::Mat( m_height, m_width, CV_8UC1, tmp ) );
-
-	delete [] tmp;
-}
-
-template <>
-void ColorImage<unsigned char, ColorSpace::CS_RGB>::writeCV( const std::string& fileName ) const
-{
-	unsigned char* tmp = new unsigned char[m_memAllocated];
-
-	ColorImage<unsigned char, ColorSpace::CS_RGB>::writeCVHelper( tmp, 1.0f );
-
-	cv::imwrite( fileName, cv::Mat( m_height, m_width, CV_8UC3, tmp ) );
-
-	delete [] tmp;
-}
-
-template <>
-void ColorImage<unsigned char, ColorSpace::CS_HSV>::writeCV( const std::string& fileName ) const
-{
-	unsigned char* tmp = new unsigned char[m_memAllocated];
-
-	ColorImage<unsigned char, ColorSpace::CS_HSV>::writeCVHelper( tmp, 1.0f );
-
-	cv::imwrite( fileName, cv::Mat( m_height, m_width, CV_8UC3, tmp ) );
-
-	delete [] tmp;
-}
-
-template <>
-void ColorImage<unsigned char, ColorSpace::CS_LAB>::writeCV( const std::string& fileName ) const
-{
-	unsigned char* tmp = new unsigned char[m_memAllocated];
-
-	ColorImage<unsigned char, ColorSpace::CS_LAB>::writeCVHelper( tmp, 1.0f );
-
-	cv::imwrite( fileName, cv::Mat( m_height, m_width, CV_8UC3, tmp ) );
-
-	delete [] tmp;
-}
-
-template <>
-void ColorImage<unsigned char, ColorSpace::CS_BGR>::writeCV( const std::string& fileName ) const
-{
-	unsigned char* tmp = new unsigned char[m_memAllocated];
-
-	ColorImage<unsigned char, ColorSpace::CS_BGR>::writeCVHelper( tmp, 1.0f );
-
-	cv::imwrite( fileName, cv::Mat( m_height, m_width, CV_8UC3, tmp ) );
-
-	delete [] tmp;
-}
-
-template <>
-void ColorImage<unsigned char, ColorSpace::CS_RGBA>::writeCV( const std::string& fileName ) const
-{
-	unsigned char* tmp = new unsigned char[m_memAllocated];
-
-	ColorImage<unsigned char, ColorSpace::CS_RGBA>::writeCVHelper( tmp, 1.0f );
-
-	cv::imwrite( fileName, cv::Mat( m_height, m_width, CV_8UC4, tmp ) );
-
-	delete [] tmp;
-}
-
-template <>
-void ColorImage<unsigned char, ColorSpace::CS_BGRA>::writeCV( const std::string& fileName ) const
-{
-	unsigned char* tmp = new unsigned char[m_memAllocated];
-
-	ColorImage<unsigned char, ColorSpace::CS_BGRA>::writeCVHelper( tmp, 1.0f );
-
-	cv::imwrite( fileName, cv::Mat( m_height, m_width, CV_8UC4, tmp ) );
-
-	delete [] tmp;
-}
-
-template <>
-void ColorImage<unsigned char, ColorSpace::CS_ARGB>::writeCV( const std::string& fileName ) const
-{
-	unsigned char* tmp = new unsigned char[m_memAllocated];
-
-	ColorImage<unsigned char, ColorSpace::CS_ARGB>::writeCVHelper( tmp, 1.0f );
-
-	cv::imwrite( fileName, cv::Mat( m_height, m_width, CV_8UC4, tmp ) );
-
-	delete [] tmp;
-}
-
-template <typename FormatT, ColorSpace cs>
-void ColorImage<FormatT, cs>::writeCVHelper( FormatT* trgData , const float scale ) const
-{
 	if ( m_numChan == 1 )
 	{
 		for ( int i = 0; i < m_memAllocated; ++i )
 		{
-			trgData[i] = m_data[i] * scale;
-		}
-	} 
-	else if ( m_numChan == 3 )
-	{
-		for ( int i = 0; i < m_memAllocated; i += m_numChan )
-		{
-			trgData[i] = m_data[i + m_offsetB] * scale;
-			trgData[i + 1] = m_data[i + m_offsetG] * scale;
-			trgData[i + 2] = m_data[i + m_offsetR] * scale;
-		}
-	} 
-	else if (m_numChan == 4) 
-	{
-		for ( int i = 0; i < m_memAllocated; i += m_numChan )
-		{
-			trgData[i] = m_data[i + m_offsetB] * scale;
-			trgData[i + 1] = m_data[i + m_offsetG] * scale;
-			trgData[i + 2] = m_data[i + m_offsetR] * scale;
-			trgData[i + 3] = m_data[i + m_offsetA] * scale;
+			trgData[i] = Image<FormatT>::convertValue( m_data[i], unsigned char() );
 		}
 	}
+	else if ( m_numChan == 3 || m_numChan == 4 )
+	{
+		for ( int i = 0; i < m_memAllocated; i += m_numChan )
+		{
+			trgData[i] = Image<FormatT>::convertValue( m_data[i + m_offsetB], unsigned char() );
+			trgData[i + 1] = Image<FormatT>::convertValue( m_data[i + m_offsetG], unsigned char() );
+			trgData[i + 2] = Image<FormatT>::convertValue( m_data[i + m_offsetR], unsigned char() );
+			if ( m_numChan == 4 )
+			{
+				trgData[i + 3] = Image<FormatT>::convertValue( m_data[i + m_offsetA], unsigned char() );
+			}
+		}
+	}
+
+	writeCVHelper( fileName, trgData );
+
+	delete[] trgData;
+}
+
+template <>
+void ColorImage<float, ColorSpace::CS_GRAY>::writeCVHelper( const std::string& fileName, float tmp[] ) const
+{
+	cv::imwrite( fileName, cv::Mat( m_height, m_width, CV_32FC1, tmp ) );
+}
+
+template <>
+void ColorImage<float, ColorSpace::CS_RGB>::writeCVHelper( const std::string& fileName, float tmp[] ) const
+{
+	cv::imwrite( fileName, cv::Mat( m_height, m_width, CV_32FC3, tmp ) );
+}
+
+template <>
+void ColorImage<float, ColorSpace::CS_HSV>::writeCVHelper( const std::string& fileName, float tmp[] ) const
+{
+	cv::imwrite( fileName, cv::Mat( m_height, m_width, CV_32FC3, tmp ) );
+}
+
+template <>
+void ColorImage<float, ColorSpace::CS_LAB>::writeCVHelper( const std::string& fileName, float tmp[] ) const
+{
+	cv::imwrite( fileName, cv::Mat( m_height, m_width, CV_32FC3, tmp ) );
+}
+
+template <>
+void ColorImage<float, ColorSpace::CS_BGR>::writeCVHelper( const std::string& fileName, float tmp[] ) const
+{
+	cv::imwrite( fileName, cv::Mat( m_height, m_width, CV_32FC3, tmp ) );
+}
+
+template <>
+void ColorImage<float, ColorSpace::CS_RGBA>::writeCVHelper( const std::string& fileName, float tmp[] ) const
+{
+	cv::imwrite( fileName, cv::Mat( m_height, m_width, CV_32FC4, tmp ) );
+}
+
+template <>
+void ColorImage<float, ColorSpace::CS_BGRA>::writeCVHelper( const std::string& fileName, float tmp[] ) const
+{
+	cv::imwrite( fileName, cv::Mat( m_height, m_width, CV_32FC4, tmp ) );
+}
+
+template <>
+void ColorImage<float, ColorSpace::CS_ARGB>::writeCVHelper( const std::string& fileName, float tmp[] ) const
+{
+	cv::imwrite( fileName, cv::Mat( m_height, m_width, CV_32FC4, tmp ) );
+}
+
+template <>
+void ColorImage<unsigned char, ColorSpace::CS_GRAY>::writeCVHelper( const std::string& fileName, unsigned char tmp[] ) const
+{
+	cv::imwrite( fileName, cv::Mat( m_height, m_width, CV_8UC1, tmp ) );
+}
+
+template <>
+void ColorImage<unsigned char, ColorSpace::CS_RGB>::writeCVHelper( const std::string& fileName, unsigned char tmp[] ) const
+{
+	cv::imwrite( fileName, cv::Mat( m_height, m_width, CV_8UC3, tmp ) );
+}
+
+template <>
+void ColorImage<unsigned char, ColorSpace::CS_HSV>::writeCVHelper( const std::string& fileName, unsigned char tmp[] ) const
+{
+	cv::imwrite( fileName, cv::Mat( m_height, m_width, CV_8UC3, tmp ) );
+}
+
+template <>
+void ColorImage<unsigned char, ColorSpace::CS_LAB>::writeCVHelper( const std::string& fileName, unsigned char tmp[] ) const
+{
+	cv::imwrite( fileName, cv::Mat( m_height, m_width, CV_8UC3, tmp ) );
+}
+
+template <>
+void ColorImage<unsigned char, ColorSpace::CS_BGR>::writeCVHelper( const std::string& fileName, unsigned char tmp[] ) const
+{
+	cv::imwrite( fileName, cv::Mat( m_height, m_width, CV_8UC3, tmp ) );
+}
+
+template <>
+void ColorImage<unsigned char, ColorSpace::CS_RGBA>::writeCVHelper( const std::string& fileName, unsigned char tmp[] ) const
+{
+	cv::imwrite( fileName, cv::Mat( m_height, m_width, CV_8UC4, tmp ) );
+}
+
+template <>
+void ColorImage<unsigned char, ColorSpace::CS_BGRA>::writeCVHelper( const std::string& fileName, unsigned char tmp[] ) const
+{
+	cv::imwrite( fileName, cv::Mat( m_height, m_width, CV_8UC4, tmp ) );
+}
+
+template <>
+void ColorImage<unsigned char, ColorSpace::CS_ARGB>::writeCVHelper( const std::string& fileName, unsigned char tmp[] ) const
+{
+	cv::imwrite( fileName, cv::Mat( m_height, m_width, CV_8UC4, tmp ) );
 }
 
 template <typename FormatT, ColorSpace cs>
@@ -536,7 +440,6 @@ void ColorImage<FormatT, cs>::reallocateMemory( int width, int height, int numCh
 		std::cout << "No need to reallocate." << std::endl;
 	}
 }
-
 
 template <typename FormatT, ColorSpace cs>
 void ColorImage<FormatT, cs>::setRGBAOffsets()
