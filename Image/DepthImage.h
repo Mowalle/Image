@@ -1,8 +1,8 @@
 #pragma once
 #include "Image.h"
 
-template <typename Type>
-class DepthImage : public Image<Type>
+template <typename T>
+class DepthImage : public Image<T>
 {
 public:
 	DepthImage(void);

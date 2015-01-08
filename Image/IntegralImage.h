@@ -2,8 +2,8 @@
 
 #include "Image.h"
 
-template <typename Type>
-class IntegralImage : public Image<Type>
+template <typename T>
+class IntegralImage : public Image<T>
 {
 public:
 	IntegralImage(void);

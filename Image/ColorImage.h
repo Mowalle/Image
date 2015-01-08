@@ -15,8 +15,8 @@
 **/
 enum class ColorSpace { CS_GRAY = 0, CS_RGB, CS_HSV, CS_LAB, CS_RGBA, CS_BGRA, CS_ARGB, CS_BGR };
 
-template <typename FormatT, ColorSpace cs>
-class ColorImage : public Image < FormatT >
+template <typename T, ColorSpace C>
+class ColorImage : public Image < T >
 {
 public:
 	// Implementing each constructor because C++11 (which features constructor delegation) is only partially implemented in VS2012.
@@ -33,8 +33,8 @@ public:
 	void write( const std::string &fileName ) const;
 	void copy( ColorImage* src ) const;
 
-	template< typename OtherFormatT, ColorSpace OtherClrSpace >
-	void convert( ColorImage<OtherFormatT, OtherClrSpace>* out ) const;
+	template< typename U, ColorSpace OtherClrSpace >
+	void convert( ColorImage<U, OtherClrSpace>* out ) const;
 
 	// Accessors
 
@@ -54,26 +54,13 @@ public:
 	int V( int n ) const { return n * m_numChan + m_offsetB; }
 
 	// Getters
-
-	int getNumberOfChannels() const { return m_numChan; }
-	unsigned int getOffsetR() const { return m_offsetR; }
-	unsigned int getOffsetG() const { return m_offsetG; }
-	unsigned int getOffsetB() const { return m_offsetB; }
-	unsigned int getOffsetA() const { return m_offsetA; }
+	int getNumberOfChannels() const;
+	unsigned int getOffsetR() const;
+	unsigned int getOffsetG() const;
+	unsigned int getOffsetB() const;
+	unsigned int getOffsetA() const;
 	
 private:
-
-	ColorImage& operator = ( const ColorImage& rhs );
-	ColorImage( const ColorImage& other );
-
-	bool readCV( const std::string& fileName );
-
-	void writeCV( const std::string& fileName ) const;
-	void writeCVHelper( const std::string& fileName, FormatT tmp[] ) const;
-
-	void reallocateMemory() { reallocateMemory( m_width, m_height, m_numChan); }
-	void reallocateMemory( int width, int height, int numChan );
-	void setRGBAOffsets();	// TODO: Fix need for this somehow with specialization
 
 	int			 m_numChan;
 	unsigned int m_offsetR;
@@ -81,6 +68,17 @@ private:
 	unsigned int m_offsetB;
 	unsigned int m_offsetA;
 
+	ColorImage& operator = ( const ColorImage& rhs );
+	ColorImage( const ColorImage& other );
+
+	bool readCV( const std::string& fileName );
+
+	void writeCV( const std::string& fileName ) const;
+	void writeCVHelper( const std::string& fileName, T tmp[] ) const;
+
+	void reallocateMemory() { reallocateMemory( m_width, m_height, m_numChan); }
+	void reallocateMemory( int width, int height, int numChan );
+	void setRGBAOffsets();	// TODO: Fix need for this somehow with specialization
 };
 
 //	To define methods for this template include source file.
