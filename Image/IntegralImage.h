@@ -2,7 +2,7 @@
 
 #include "Image.h"
 
-template <typename T>
+template<typename T>
 class IntegralImage : public Image<T>
 {
 public:
