@@ -4,25 +4,31 @@
 
 #include "Image.h"
 
-#include <iostream>
-#include <string>
-#include <fstream>		// For dummy file reading
-#include <algorithm>	// For std::max()
-#include <type_traits>
+#include<iostream>
+#include<string>
+#include<fstream>		// For dummy file reading
+#include<algorithm>	// For std::max()
+#include<type_traits>
 
-#include <opencv2\core\core.hpp>
-#include <opencv2\highgui\highgui.hpp>
+#include<opencv2\core\core.hpp>
+#include<opencv2\highgui\highgui.hpp>
 
 /**
 *	Defines various color spaces.
 *	Declared outside of class because of template.
 **/
-enum class ColorSpace 
-{ 
+enum class ColorSpace
+{
     CS_GRAY = 0, CS_RGB, CS_BGR, CS_HSV, CS_LAB, CS_RGBA, CS_BGRA, CS_ARGB
 };
 
-template<typename T, ColorSpace C>
+template < typename T, ColorSpace C >
+class ColorImageBase : public Image < T >
+{
+
+};
+
+template < typename T, ColorSpace C >
 class ColorImage : public Image < T >
 {
     //public:
@@ -40,7 +46,7 @@ class ColorImage : public Image < T >
     //	void write(const std::string& fileName) const;
     //	void copy(ColorImage* outputImage) const;
     //
-    //	template<typename U, ColorSpace OtherClrSpace >
+    //	template<typename U, ColorSpace OtherClrSpace>
     //	void convert(ColorImage<U, OtherClrSpace>* out) const;
     //
     //	// Accessors
@@ -89,126 +95,137 @@ class ColorImage : public Image < T >
 
 
 
-template<ColorSpace C >
-class ColorImage<unsigned char, C> : public Image<unsigned char> 
+template<ColorSpace C>
+class ColorImage<unsigned char, C> : public Image < unsigned char >
 {
-    public:      
-        // TODO: Friending all specializations to gain access to their 
-        // internals. No idea how to circumvent this yet.
-        friend class ColorImage<unsigned char, ColorSpace::CS_GRAY>;
-        friend class ColorImage<unsigned char, ColorSpace::CS_RGB>;
-        friend class ColorImage<unsigned char, ColorSpace::CS_BGR>;
-        friend class ColorImage<unsigned char, ColorSpace::CS_HSV>;
-        friend class ColorImage<unsigned char, ColorSpace::CS_LAB>;
-        friend class ColorImage<unsigned char, ColorSpace::CS_RGBA>;
-        friend class ColorImage<unsigned char, ColorSpace::CS_BGRA>;
-        friend class ColorImage<unsigned char, ColorSpace::CS_ARGB>;
-        friend class ColorImage<float, ColorSpace::CS_GRAY>;
-        friend class ColorImage<float, ColorSpace::CS_RGB>;
-        friend class ColorImage<float, ColorSpace::CS_BGR>;
-        friend class ColorImage<float, ColorSpace::CS_HSV>;
-        friend class ColorImage<float, ColorSpace::CS_LAB>;
-        friend class ColorImage<float, ColorSpace::CS_RGBA>;
-        friend class ColorImage<float, ColorSpace::CS_BGRA>;
-        friend class ColorImage<float, ColorSpace::CS_ARGB>;
-
-        static int getNumberOfChannels(const ColorSpace colorSpace);
-
-        ColorImage();
-        ColorImage(int width, int height);
-        explicit ColorImage(const std::string& fileName);
-
-        ColorImage(const ColorImage& other);    // Copy Constructor
-        ColorImage(ColorImage&& other);         // C++11 Move Contructor
-
-        ~ColorImage();
-
-        ColorImage& operator =(const ColorImage& rhs);  // Copy Assignment Operator
-        // UNDONE:
-        //ColorImage& operator =(ColorImage&& rhs); // C++11 Move Assignment Operator
-
-        bool read(const std::string& fileName);
-        void write(const std::string& fileName) const;
-        void copy(ColorImage* output) const;
-
-        // INFO: Direct conversion between HSV and Grey does not work as intended
-        // (converion assumes HSV values as RGB values and vice versa). Use another
-        // conversion to RGB to circumvent this.
-        template<ColorSpace D>
-        void convertColorSpace(ColorImage<unsigned char, D>* output) const;
-        void convertType(ColorImage< float, C>* output) const;
-
-        template<typename U, ColorSpace D >
-        bool compareDimensions(const ColorImage< U, D >& other) const;
-
-        // Accessors
-
-        int R(int pixelNo) const;
-        int G(int pixelNo) const;
-        int B(int pixelNo) const;
-        int A(int pixelNo) const;
-        int H(int pixelNo) const;
-        int S(int pixelNo) const;
-        int V(int pixelNo) const;
-
-        int R(int x, int y) const;
-        int G(int x, int y) const;
-        int B(int x, int y) const;
-        int A(int x, int y) const;
-        int H(int x, int y) const;
-        int S(int x, int y) const;
-        int V(int x, int y) const;
-
-        // Getters
-        int	        getChannels() const;
-        unsigned int	getOffsetR()  const;
-        unsigned int	getOffsetG()  const;
-        unsigned int	getOffsetB()  const;
-        unsigned int	getOffsetA()  const;
-
-    private:
-        int          m_channels;
-        unsigned int m_offsetR;
-        unsigned int m_offsetG;
-        unsigned int m_offsetB;
-        unsigned int m_offsetA;
-
-        void convertToHsv();
-        void convertFromHsv();
-        void convertColorToHsv(float  r, float  g, float  b,
-                               float* h, float* s, float* v);
-        void convertColorFromHsv(float  h, float  s, float  v, 
-                                 float* r, float* g, float* b);
-        
-        bool readCv(const std::string& fileName);
-
-        void setRGBAOffsets();
-};
-
-template<ColorSpace C >
-class ColorImage<float, C> : public Image<float> 
-{
-public:      
+public:
     // TODO: Friending all specializations to gain access to their 
     // internals. No idea how to circumvent this yet.
-    friend class ColorImage<unsigned char, ColorSpace::CS_GRAY>;
-    friend class ColorImage<unsigned char, ColorSpace::CS_RGB>;
-    friend class ColorImage<unsigned char, ColorSpace::CS_BGR>;
-    friend class ColorImage<unsigned char, ColorSpace::CS_HSV>;
-    friend class ColorImage<unsigned char, ColorSpace::CS_LAB>;
-    friend class ColorImage<unsigned char, ColorSpace::CS_RGBA>;
-    friend class ColorImage<unsigned char, ColorSpace::CS_BGRA>;
-    friend class ColorImage<unsigned char, ColorSpace::CS_ARGB>;
-    friend class ColorImage<float, ColorSpace::CS_GRAY>;
-    friend class ColorImage<float, ColorSpace::CS_RGB>;
-    friend class ColorImage<float, ColorSpace::CS_BGR>;
-    friend class ColorImage<float, ColorSpace::CS_HSV>;
-    friend class ColorImage<float, ColorSpace::CS_LAB>;
-    friend class ColorImage<float, ColorSpace::CS_RGBA>;
-    friend class ColorImage<float, ColorSpace::CS_BGRA>;
-    friend class ColorImage<float, ColorSpace::CS_ARGB>;
+    friend class ColorImage < unsigned char, ColorSpace::CS_GRAY >;
+    friend class ColorImage < unsigned char, ColorSpace::CS_RGB >;
+    friend class ColorImage < unsigned char, ColorSpace::CS_BGR >;
+    friend class ColorImage < unsigned char, ColorSpace::CS_HSV >;
+    friend class ColorImage < unsigned char, ColorSpace::CS_LAB >;
+    friend class ColorImage < unsigned char, ColorSpace::CS_RGBA >;
+    friend class ColorImage < unsigned char, ColorSpace::CS_BGRA >;
+    friend class ColorImage < unsigned char, ColorSpace::CS_ARGB >;
+    friend class ColorImage < float, ColorSpace::CS_GRAY >;
+    friend class ColorImage < float, ColorSpace::CS_RGB >;
+    friend class ColorImage < float, ColorSpace::CS_BGR >;
+    friend class ColorImage < float, ColorSpace::CS_HSV >;
+    friend class ColorImage < float, ColorSpace::CS_LAB >;
+    friend class ColorImage < float, ColorSpace::CS_RGBA >;
+    friend class ColorImage < float, ColorSpace::CS_BGRA >;
+    friend class ColorImage < float, ColorSpace::CS_ARGB >;
 
     static int getNumberOfChannels(const ColorSpace colorSpace);
+    static int getCvType(const ColorSpace colorSpace);
+
+    ColorImage();
+    ColorImage(int width, int height);
+    explicit ColorImage(const std::string& fileName);
+
+    ColorImage(const ColorImage& other);    // Copy Constructor
+    ColorImage(ColorImage&& other);         // C++11 Move Contructor
+
+    ~ColorImage();
+
+    ColorImage& operator =(const ColorImage& rhs);  // Copy Assignment Operator
+    // UNDONE:
+    //ColorImage& operator =(ColorImage&& rhs); // C++11 Move Assignment Operator
+
+    bool read(const std::string& fileName);
+    void write(const std::string& fileName) const;
+    void copy(ColorImage* output) const;
+
+    // INFO: Direct conversion between HSV and Grey does not work as intended
+    // (converion assumes HSV values as RGB values and vice versa). Use another
+    // conversion to RGB to circumvent this.
+    template<ColorSpace D>
+    void convertColorSpace(ColorImage<unsigned char, D>* output) const;
+    void convertType(ColorImage<float, C>* output) const;
+
+    template<typename U, ColorSpace D>
+    bool compareDimensions(const ColorImage<U, D>& other) const;
+
+    // Warning: Current image becomes invalid!
+    void resize(int width, int height);
+
+    void setToBlack();
+    void setToValue(unsigned char value);
+    void setToValue(unsigned char r, unsigned char g, unsigned char b,
+                    unsigned char a);
+
+    // Accessors
+
+    int R(int pixelNo) const;
+    int G(int pixelNo) const;
+    int B(int pixelNo) const;
+    int A(int pixelNo) const;
+    int H(int pixelNo) const;
+    int S(int pixelNo) const;
+    int V(int pixelNo) const;
+
+    int R(int x, int y) const;
+    int G(int x, int y) const;
+    int B(int x, int y) const;
+    int A(int x, int y) const;
+    int H(int x, int y) const;
+    int S(int x, int y) const;
+    int V(int x, int y) const;
+
+    // Getters
+    int             size() const;
+    int	            getChannels()  const;
+    unsigned int	getOffsetR()   const;
+    unsigned int	getOffsetG()   const;
+    unsigned int	getOffsetB()   const;
+    unsigned int	getOffsetA()   const;
+
+private:
+    int          m_channels;
+    unsigned int m_offsetR;
+    unsigned int m_offsetG;
+    unsigned int m_offsetB;
+    unsigned int m_offsetA;
+
+    void convertToHsv();
+    void convertFromHsv();
+    void convertColorToHsv(float  r, float  g, float  b,
+                           float* h, float* s, float* v);
+    void convertColorFromHsv(float  h, float  s, float  v,
+                             float* r, float* g, float* b);
+
+    bool readCv(const std::string& fileName);
+
+    void setRGBAOffsets();
+};
+
+template<ColorSpace C>
+class ColorImage<float, C> : public Image < float >
+{
+public:
+    // TODO: Friending all specializations to gain access to their 
+    // internals. No idea how to circumvent this yet.
+    friend class ColorImage < unsigned char, ColorSpace::CS_GRAY >;
+    friend class ColorImage < unsigned char, ColorSpace::CS_RGB >;
+    friend class ColorImage < unsigned char, ColorSpace::CS_BGR >;
+    friend class ColorImage < unsigned char, ColorSpace::CS_HSV >;
+    friend class ColorImage < unsigned char, ColorSpace::CS_LAB >;
+    friend class ColorImage < unsigned char, ColorSpace::CS_RGBA >;
+    friend class ColorImage < unsigned char, ColorSpace::CS_BGRA >;
+    friend class ColorImage < unsigned char, ColorSpace::CS_ARGB >;
+    friend class ColorImage < float, ColorSpace::CS_GRAY >;
+    friend class ColorImage < float, ColorSpace::CS_RGB >;
+    friend class ColorImage < float, ColorSpace::CS_BGR >;
+    friend class ColorImage < float, ColorSpace::CS_HSV >;
+    friend class ColorImage < float, ColorSpace::CS_LAB >;
+    friend class ColorImage < float, ColorSpace::CS_RGBA >;
+    friend class ColorImage < float, ColorSpace::CS_BGRA >;
+    friend class ColorImage < float, ColorSpace::CS_ARGB >;
+
+    static int getNumberOfChannels(const ColorSpace colorSpace);
+    static int getCvType(const ColorSpace colorSpace);
 
     ColorImage();
     ColorImage(int width, int height);
@@ -234,8 +251,15 @@ public:
     void convertColorSpace(ColorImage<float, D>* output) const;
     void convertType(ColorImage<unsigned char, C>* output) const;
 
-    template<typename U, ColorSpace D >
-    bool compareDimensions(const ColorImage< U, D >& other) const;
+    template<typename U, ColorSpace D>
+    bool compareDimensions(const ColorImage<U, D>& other) const;
+
+    // Warning: Current image becomes invalid!
+    void resize(int width, int height);
+
+    void setToBlack();
+    void setToValue(float f);
+    void setToValue(float r, float g, float b, float a);
 
     // Accessors
 
@@ -273,7 +297,14 @@ private:
     void convertFromHsv();
     void convertColorToHsv(float  r, float  g, float  b,
                            float* h, float* s, float* v);
-    void convertColorFromHsv(float  h, float  s, float  v, 
+    void convertColorFromHsv(float  h, float  s, float  v,
+                             float* r, float* g, float* b);
+
+    void convertToLab();
+    void convertFromLab();
+    void convertColorToLab(float  r, float g, float b,
+                           float* lo, float* ao, float* bo);
+    void convertColorFromLab(float  lIn, float  gIn, float  bIn,
                              float* r, float* g, float* b);
 
     bool readCv(const std::string& fileName);

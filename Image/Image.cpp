@@ -21,8 +21,8 @@ Image<T>::Image(int width, int height) :
 
 }
 
-template<typename T >
-Image< T >::Image(const Image& other) : 
+template<typename T>
+Image<T>::Image(const Image& other) : 
     m_width(other.m_width), 
     m_height(other.m_height), 
     m_allocatedMemory(other.m_allocatedMemory),
@@ -69,13 +69,14 @@ Image<T>& Image<T>::operator =(const Image& rhs)
 
         m_allocatedMemory = rhs.m_allocatedMemory;
         m_data = new unsigned char[m_allocatedMemory];
-        for (int i = 0; i < m_allocatedMemory; ++i)
+        for (int i = 0; i<m_allocatedMemory; ++i)
         {
             m_data[i] = rhs.m_data[i];
         }
     }
     return *this;
 }
+
 
 // UNDONE: Move Assignment Operator
 //template<typename T>
@@ -106,6 +107,13 @@ Image<T>& Image<T>::operator =(const Image& rhs)
 //}
 
 template<typename T>
+int Image<T>::size() const
+{
+    return m_width * m_height;
+}
+
+
+template<typename T>
 T* Image<T>::getData() const
 {
     return m_data;
@@ -126,22 +134,11 @@ int Image<T>::getHeight() const
 }
 
 template<typename T>
-int Image<T>::getMemAllocated() const
+int Image<T>::getAllocatedMemory() const
 {
     return m_allocatedMemory;
 }
 
-template<typename T>
-void Image<T>::setWidth(int width)
-{
-    m_width = width;
-}
-
-template<typename T>
-void Image<T>::setHeight(int height)
-{
-    m_height = height;
-}
 
 /** ------------------------------------
 *				  protected

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <iostream>
-#include <string>
+#include<iostream>
+#include<string>
 
 template<typename T>
 class Image
@@ -26,16 +26,14 @@ public :
 
     virtual bool read(const std::string& fileName) = 0;
     virtual void write(const std::string& fileName) const = 0;
-    
+        
     // Getter
-    T*  getData()         const;
-    int getWidth()        const;
-    int getHeight()       const;
-    int getMemAllocated() const;
+    int size()       const;
+    T*  getData()            const;
+    int getWidth()           const;
+    int getHeight()          const;
+    int getAllocatedMemory() const;
 
-    // Setter
-    void setWidth(int width);
-    void setHeight(int height);
             
 protected :
     
