@@ -153,8 +153,10 @@ public:
 
     void setToBlack();
     void setToValue(unsigned char value);
-    void setToValue(unsigned char r, unsigned char g, unsigned char b,
-                    unsigned char a);
+    void setToValue(unsigned char r,
+                    unsigned char g,
+                    unsigned char b,
+                    unsigned char a = 255);
 
     // Accessors
 
@@ -191,10 +193,19 @@ private:
 
     void convertToHsv();
     void convertFromHsv();
-    void convertColorToHsv(float  r, float  g, float  b,
-                           float* h, float* s, float* v);
-    void convertColorFromHsv(float  h, float  s, float  v,
-                             float* r, float* g, float* b);
+    void convertColorToHsv(float  r,
+                           float  g,
+                           float  b,
+                           float* h,
+                           float* s,
+                           float* v);
+
+    void convertColorFromHsv(float  h,
+                             float  s,
+                             float  v,
+                             float* r,
+                             float* g,
+                             float* b);
 
     bool readCv(const std::string& fileName);
 
@@ -259,7 +270,7 @@ public:
 
     void setToBlack();
     void setToValue(float f);
-    void setToValue(float r, float g, float b, float a);
+    void setToValue(float r, float g, float b, float a = 1.0f);
 
     // Accessors
 
@@ -295,17 +306,35 @@ private:
 
     void convertToHsv();
     void convertFromHsv();
-    void convertColorToHsv(float  r, float  g, float  b,
-                           float* h, float* s, float* v);
-    void convertColorFromHsv(float  h, float  s, float  v,
-                             float* r, float* g, float* b);
+    void convertColorToHsv(float  r,
+                           float  g,
+                           float  b,
+                           float* h,
+                           float* s, 
+                           float* v);
+
+    void convertColorFromHsv(float  h,
+                             float  s,
+                             float  v,
+                             float* r,
+                             float* g,
+                             float* b);
 
     void convertToLab();
     void convertFromLab();
-    void convertColorToLab(float  r, float g, float b,
-                           float* lo, float* ao, float* bo);
-    void convertColorFromLab(float  lIn, float  gIn, float  bIn,
-                             float* r, float* g, float* b);
+    void convertColorToLab(float  r,
+                           float  g,
+                           float  b,
+                           float* lo,
+                           float* ao,
+                           float* bo);
+
+    void convertColorFromLab(float  lIn,
+                             float  gIn,
+                             float  bIn,
+                             float* r,
+                             float* g,
+                             float* b);
 
     bool readCv(const std::string& fileName);
 

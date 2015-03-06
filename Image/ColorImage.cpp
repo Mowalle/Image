@@ -117,24 +117,24 @@ int ColorImage<float, C>::getCvType(const ColorSpace colorSpace)
 /* Constructors */
 
 template<ColorSpace C>
-ColorImage<unsigned char, C>::ColorImage() : 
-    Image(), m_channels(getNumberOfChannels(C))
+ColorImage<unsigned char, C>::ColorImage() :
+Image(), m_channels(getNumberOfChannels(C))
 {
     setRGBAOffsets();
     std::cout << "ColorImage default constructor" << std::endl;
 }
 
 template<ColorSpace C>
-ColorImage<float, C>::ColorImage() : 
-    Image(), m_channels(getNumberOfChannels(C))
+ColorImage<float, C>::ColorImage() :
+Image(), m_channels(getNumberOfChannels(C))
 {
     setRGBAOffsets();
     std::cout << "ColorImage default constructor" << std::endl;
 }
 
 template<ColorSpace C>
-ColorImage<unsigned char, C>::ColorImage(int width, int height) : 
-    Image(width, height), m_channels(getNumberOfChannels(C))
+ColorImage<unsigned char, C>::ColorImage(int width, int height) :
+Image(width, height), m_channels(getNumberOfChannels(C))
 {
     setRGBAOffsets();
     m_allocatedMemory = m_width * m_height * m_channels;
@@ -145,7 +145,7 @@ ColorImage<unsigned char, C>::ColorImage(int width, int height) :
 
 template<ColorSpace C>
 ColorImage<float, C>::ColorImage(int width, int height) :
-    Image(width, height), m_channels(getNumberOfChannels(C))
+Image(width, height), m_channels(getNumberOfChannels(C))
 {
     setRGBAOffsets();
     m_allocatedMemory = m_width * m_height * m_channels;
@@ -166,7 +166,7 @@ ColorImage<unsigned char, C>::ColorImage(const std::string& fileName) : Image(),
 
 template<ColorSpace C>
 ColorImage<float, C>::ColorImage(const std::string& fileName) :
-    Image(), m_channels(getNumberOfChannels(C))
+Image(), m_channels(getNumberOfChannels(C))
 {
     setRGBAOffsets();
     // allocateMemory() call later in readCv, since width and height have to be
@@ -188,9 +188,9 @@ ColorImage<unsigned char, C>::ColorImage(const ColorImage& other)
 
 template<ColorSpace C>
 ColorImage<float, C>::ColorImage(const ColorImage& other) :
-    Image(other), m_channels(other.m_channels),
-    m_offsetR(other.m_offsetR), m_offsetG(other.m_offsetG),
-    m_offsetB(other.m_offsetB), m_offsetA(other.m_offsetA)
+Image(other), m_channels(other.m_channels),
+m_offsetR(other.m_offsetR), m_offsetG(other.m_offsetG),
+m_offsetB(other.m_offsetB), m_offsetA(other.m_offsetA)
 {
 }
 
@@ -291,12 +291,10 @@ bool ColorImage<float, C>::read(const std::string& fileName)
         throwsError = readCv(fileName);
     }
 
-    // UNDONE: What happens if C == CS_LAB?
     if (C == ColorSpace::CS_HSV)
     {
         ColorImage::convertToHsv();
-    }
-    else if (C == ColorSpace::CS_LAB)
+    } else if (C == ColorSpace::CS_LAB)
     {
         ColorImage::convertToLab();
     }
@@ -415,8 +413,7 @@ void ColorImage<unsigned char, C>::convertColorSpace(ColorImage<unsigned char, D
     if (C == D)
     {
         memcpy(output->m_data, m_data, neededMemory * sizeof(unsigned char));
-    }
-    else
+    } else
     {
         // Case 1: Both images have same number of channels
         if (m_channels == output->m_channels)
@@ -496,8 +493,7 @@ void ColorImage<unsigned char, C>::convertColorSpace(ColorImage<unsigned char, D
     if (C == ColorSpace::CS_HSV && D != ColorSpace::CS_HSV)
     {
         output->convertFromHsv();
-    }
-    else if (C != ColorSpace::CS_HSV && D == ColorSpace::CS_HSV)
+    } else if (C != ColorSpace::CS_HSV && D == ColorSpace::CS_HSV)
     {
         output->convertToHsv();
     }
@@ -525,8 +521,7 @@ void ColorImage<float, C>::convertColorSpace(
     if (C == D)
     {
         memcpy(output->m_data, m_data, neededMemory * sizeof(float));
-    }
-    else
+    } else
     {
         // Case 1: Both images have same number of channels
         if (m_channels == output->m_channels)
@@ -609,8 +604,7 @@ void ColorImage<float, C>::convertColorSpace(
     if (C == ColorSpace::CS_HSV && D != ColorSpace::CS_HSV)
     {
         output->convertFromHsv();
-    }
-    else if (C != ColorSpace::CS_HSV && D == ColorSpace::CS_HSV)
+    } else if (C != ColorSpace::CS_HSV && D == ColorSpace::CS_HSV)
     {
         output->convertToHsv();
     }
@@ -690,7 +684,7 @@ void ColorImage<unsigned char, C>::resize(int width, int height)
     int neededMemory = m_width * m_height * m_channels;
     if (neededMemory > m_allocatedMemory)
     {
-        delete [] m_data;
+        delete[] m_data;
         m_data = new unsigned char[neededMemory];
         m_allocatedMemory = neededMemory;
     }
@@ -706,7 +700,7 @@ void ColorImage<float, C>::resize(int width, int height)
     int neededMemory = m_width * m_height * m_channels;
     if (neededMemory > m_allocatedMemory)
     {
-        delete [] m_data;
+        delete[] m_data;
         m_data = new float[neededMemory];
         m_allocatedMemory = neededMemory;
     }
@@ -716,7 +710,7 @@ void ColorImage<float, C>::resize(int width, int height)
 template<ColorSpace C>
 void ColorImage<unsigned char, C>::setToBlack()
 {
-     setToValue(0, 0, 0, 255);
+    setToValue(0, 0, 0, 255);
 }
 
 
@@ -730,14 +724,14 @@ void ColorImage<float, C>::setToBlack()
 template<ColorSpace C>
 void ColorImage<unsigned char, C>::setToValue(unsigned char value)
 {
-    setToValue(value, value, value, value);
+    setToValue(value, value, value);
 }
 
 
 template<ColorSpace C>
 void ColorImage<float, C>::setToValue(float value)
 {
-    setToValue(value, value, value, value);
+    setToValue(value, value, value);
 }
 
 
@@ -745,44 +739,33 @@ template<ColorSpace C>
 void ColorImage<unsigned char, C>::setToValue(unsigned char r,
                                               unsigned char g,
                                               unsigned char b,
-                                              unsigned char a)
+                                              unsigned char a /* = 255 */)
 {
-    cv::Mat mat(m_height, m_width, getCvType(C), m_data);
-
-    cv::Vec4b v;
-    v[m_offsetR] = r;
-    if (m_channels >= 3)
+    // FIX: Performance-Hit when less than 4 channels (too much assignments)
+    for (int i = 0; i < m_width * m_height * m_channels; i += m_channels) 
     {
-        v[m_offsetB] = b;
-        v[m_offsetG] = g;
+        m_data[i + m_offsetR] = r;
+        m_data[i + m_offsetG] = g;
+        m_data[i + m_offsetB] = b;
+        m_data[i + m_offsetA] = a;
     }
-    if (m_channels == 4)
-    {
-        v[m_offsetA] = a;
-    }
-
-    mat.setTo(v);
 }
 
 
 template<ColorSpace C>
-void ColorImage<float, C>::setToValue(float r, float g, float b, float a)
+void ColorImage<float, C>::setToValue(float r,
+                                      float g,
+                                      float b,
+                                      float a /* = 1.0f */) 
 {
-    cv::Mat mat(m_height, m_width, getCvType(C), m_data);
-
-    cv::Vec4f v;
-    v[m_offsetR] = r * 255.0f;
-    if (m_channels >= 3)
+    // FIX: Performance-Hit when less than 4 channels (too much assignments)
+    for (int i = 0; i < m_width * m_height * m_channels; i += m_channels) 
     {
-        v[m_offsetB] = b * 255.0f;
-        v[m_offsetG] = g * 255.0f;
+        m_data[i + m_offsetR] = r;
+        m_data[i + m_offsetG] = g;
+        m_data[i + m_offsetB] = b;
+        m_data[i + m_offsetA] = a;
     }
-    if (m_channels == 4)
-    {
-        v[m_offsetA] = a * 255.0f;
-    }
-
-    mat.setTo(v);
 }
 
 
@@ -1195,8 +1178,7 @@ void ColorImage<float, C>::convertColorToHsv(float  r, float  g, float  b,
     if (max != 0.0f)
     {
         *s = (max - min) / max;
-    }
-    else
+    } else
     {
         *s = 0.0f;
     }
@@ -1206,8 +1188,7 @@ void ColorImage<float, C>::convertColorToHsv(float  r, float  g, float  b,
     {
         // Hue is undefined here, so we just assign 0.
         *h = 0.0f;
-    }
-    else
+    } else
     {
         float delta = max - min;
         if (r == max)
@@ -1241,15 +1222,13 @@ void ColorImage<unsigned char, C>::convertColorFromHsv(float h, float s,
             *r = v;
             *g = v;
             *b = v;
-        }
-        else
+        } else
         {
             std::cout << "HSV -> RGB conversion error (s == 0 and h> 0)\n" <<
                 std::endl;
             exit(1);
         }
-    }
-    else
+    } else
     {
         float f, p, q, t;
         int i;
@@ -1316,15 +1295,13 @@ void ColorImage<float, C>::convertColorFromHsv(float  h, float  s, float  v,
             *r = v;
             *g = v;
             *b = v;
-        }
-        else
+        } else
         {
             std::cout << "HSV -> RGB conversion error (s == 0 and h> 0)\n" <<
                 std::endl;
             exit(1);
         }
-    }
-    else
+    } else
     {
         float f, p, q, t;
         int i;
@@ -1545,8 +1522,7 @@ bool ColorImage<unsigned char, C>::readCv(const std::string& fileName)
             {
                 m_data[pixelNo] = data[j];
                 ++pixelNo;
-            }
-            else if (cvImage.channels() >= 3) // e.g. RGB
+            } else if (cvImage.channels() >= 3) // e.g. RGB
             {
                 m_data[B(pixelNo)] = data[j];
                 m_data[G(pixelNo)] = data[j + 1];
@@ -1623,8 +1599,7 @@ bool ColorImage<float, C>::readCv(const std::string& fileName)
                 m_data[pixelNo] = data[j] / 255.0f;
 
                 ++pixelNo;
-            }
-            else if (cvImage.channels() >= 3)
+            } else if (cvImage.channels() >= 3)
             {     // e.g. RGB
                 m_data[B(pixelNo)] = data[j] / 255.0f;
                 m_data[G(pixelNo)] = data[j + 1] / 255.0f;

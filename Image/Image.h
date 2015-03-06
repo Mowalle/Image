@@ -36,7 +36,6 @@ public :
 
             
 protected :
-    
     int	m_width;
     int	m_height;
     int	m_allocatedMemory;
