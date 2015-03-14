@@ -113,124 +113,76 @@ int ColorImage<float, C>::getCvType(const ColorSpace colorSpace)
 // ======================================================================================= 
 
 
-
-/* Constructors */
+// =================
+// Con-/Desctructors
+// =================
 
 template<ColorSpace C>
-ColorImage<unsigned char, C>::ColorImage() :
-Image(), m_channels(getNumberOfChannels(C))
+ColorImage<unsigned char, C>::ColorImage() : m_channels(getNumberOfChannels(C))
 {
     setRGBAOffsets();
-    std::cout << "ColorImage default constructor" << std::endl;
+    std::clog << "ColorImage default constructor" << std::endl;
 }
 
 template<ColorSpace C>
-ColorImage<float, C>::ColorImage() :
-Image(), m_channels(getNumberOfChannels(C))
+ColorImage<float, C>::ColorImage() : m_channels(getNumberOfChannels(C))
 {
     setRGBAOffsets();
-    std::cout << "ColorImage default constructor" << std::endl;
-}
-
-template<ColorSpace C>
-ColorImage<unsigned char, C>::ColorImage(int width, int height) :
-Image(width, height), m_channels(getNumberOfChannels(C))
-{
-    setRGBAOffsets();
-    m_allocatedMemory = m_width * m_height * m_channels;
-    m_data = m_allocatedMemory ? new unsigned char[m_allocatedMemory] : nullptr;
-    std::cout << "ColorImage width/height constructor" << std::endl;
+    std::clog << "ColorImage default constructor" << std::endl;
 }
 
 
 template<ColorSpace C>
-ColorImage<float, C>::ColorImage(int width, int height) :
-Image(width, height), m_channels(getNumberOfChannels(C))
+ColorImage<unsigned char, C>::ColorImage(int width, int height)
+    : Image(width, height),
+	  m_channels(getNumberOfChannels(C))
 {
+    std::clog << "ColorImage width/height constructor" << std::endl;
     setRGBAOffsets();
-    m_allocatedMemory = m_width * m_height * m_channels;
-    m_data = m_allocatedMemory ? new float[m_allocatedMemory] : nullptr;
-    std::cout << "ColorImage width/height constructor" << std::endl;
+    m_data.resize(size() * m_channels);
 }
 
 template<ColorSpace C>
-ColorImage<unsigned char, C>::ColorImage(const std::string& fileName) : Image(), m_channels(getNumberOfChannels(C))
+ColorImage<float, C>::ColorImage(int width, int height) 
+    : Image(width, height),
+	  m_channels(getNumberOfChannels(C))
 {
+    std::clog << "ColorImage width/height constructor" << std::endl;
     setRGBAOffsets();
-    // allocateMemory() call later in readCv, since width and height have to be
-    // read from file first.
+    m_data.resize(size() * m_channels);
+}
+
+
+template<ColorSpace C>
+ColorImage<unsigned char, C>::ColorImage(const std::string& fileName) 
+    : m_channels(getNumberOfChannels(C))
+{
+    std::clog << "ColorImage filename constructor" << std::endl;
+    setRGBAOffsets();
     read(fileName);
-    std::cout << "ColorImage filename constructor" << std::endl;
 }
 
-
 template<ColorSpace C>
-ColorImage<float, C>::ColorImage(const std::string& fileName) :
-Image(), m_channels(getNumberOfChannels(C))
+ColorImage<float, C>::ColorImage(const std::string& fileName) 
+    : m_channels(getNumberOfChannels(C))
 {
+    std::clog << "ColorImage filename constructor" << std::endl;
     setRGBAOffsets();
-    // allocateMemory() call later in readCv, since width and height have to be
-    // read from file first.
     read(fileName);
-    std::cout << "ColorImage filename constructor" << std::endl;
-}
-
-
-template<ColorSpace C>
-ColorImage<unsigned char, C>::ColorImage(const ColorImage& other)
-    : Image(other),
-    m_channels(other.m_channels),
-    m_offsetR(other.m_offsetR), m_offsetG(other.m_offsetG),
-    m_offsetB(other.m_offsetB), m_offsetA(other.m_offsetA)
-{
-}
-
-
-template<ColorSpace C>
-ColorImage<float, C>::ColorImage(const ColorImage& other) :
-Image(other), m_channels(other.m_channels),
-m_offsetR(other.m_offsetR), m_offsetG(other.m_offsetG),
-m_offsetB(other.m_offsetB), m_offsetA(other.m_offsetA)
-{
 }
 
 
 template<ColorSpace C>
 ColorImage<unsigned char, C>::~ColorImage()
 {
-    std::cout << "ColorImage destructor" << std::endl;
+    std::clog << "ColorImage destructor" << std::endl;
 }
 
 
 template<ColorSpace C>
 ColorImage<float, C>::~ColorImage()
 {
-    std::cout << "ColorImage destructor" << std::endl;
-}
-
-
-template<ColorSpace C>
-ColorImage<unsigned char, C>& ColorImage<unsigned char, C>::operator=(
-    const ColorImage& rhs)
-{
-    if (this != &rhs)
-    {
-        // No need for deleting current offsets, will stay the same anyway, tied to template.
-        Image::operator=(rhs);
-    }
-    return *this;
-}
-
-
-template<ColorSpace C>
-ColorImage<float, C>& ColorImage<float, C>::operator=(const ColorImage& rhs)
-{
-    if (this != &rhs)
-    {
-        // No need for deleting current offsets, will stay the same anyway, tied to template.
-        Image::operator=(rhs);
-    }
-    return *this;
+    std::clog << "ColorImage destructor" << std::endl;
 }
 
 
@@ -245,33 +197,28 @@ bool ColorImage<unsigned char, C>::read(const std::string& fileName)
     dummy.open(fileName);
 
     bool throwsError = false;
-    if (!dummy.is_open())
+    if (!dummy.is_open()) 
     {
-        std::cout << "ERROR: Could not open or find file " << fileName << ".\n";
-        throwsError = true;
-    }
-
-    if (!throwsError)
+        std::cerr << "ERROR: Could not open or find file " << fileName << "." << std::endl;
+    	throwsError = true;
+    } 
+    else 
     {
-        std::cout << "Trying to open file with OpenCV..." << std::endl;
-        // Actual Reading via OpenCV
-        throwsError = readCv(fileName);
+        std::clog << "Trying to open file with OpenCV..." << std::endl;
+        // read image using openCV
+        throwsError = !readCv(fileName);
+		
+		// special conversion if image is in HSV-Space
+		if (!throwsError && C == ColorSpace::CS_HSV)
+			ColorImage::convertToHsv();
     }
-
-    if (C == ColorSpace::CS_HSV)
-    {
-        ColorImage::convertToHsv();
-    }
-
     return throwsError;
 }
-
 
 template<ColorSpace C>
 bool ColorImage<float, C>::read(const std::string& fileName)
 {
-    // Create dummy file and check if it was a success before trying to 
-    // read image.
+    // Create dummy file and check for success before trying to read image.
     std::ifstream dummy;
     // Opening dummy file to check if it exists at all.
     // Replaced the old C-directives (may be slower).
@@ -280,25 +227,21 @@ bool ColorImage<float, C>::read(const std::string& fileName)
     bool throwsError = false;
     if (!dummy.is_open())
     {
-        std::cout << "ERROR: Could not open or find file " << fileName << ".\n";
+        std::cerr << "ERROR: Could not open or find file " << fileName << "." << std::endl;
         throwsError = true;
     }
-
-    if (!throwsError)
+    else
     {
         std::cout << "Trying to open file with OpenCV..." << std::endl;
-        // Actual Reading via OpenCV
-        throwsError = readCv(fileName);
-    }
+        // read image using openCV
+        throwsError = !readCv(fileName);
 
-    if (C == ColorSpace::CS_HSV)
-    {
-        ColorImage::convertToHsv();
-    } else if (C == ColorSpace::CS_LAB)
-    {
-        ColorImage::convertToLab();
+	// special conversion if image is in HSV- or Lab-Space
+	if (!throwsError && C == ColorSpace::CS_HSV)
+	    ColorImage::convertToHsv();
+	else if (!throwsError && C == ColorSpace::CS_LAB)
+	    ColorImage::convertToLab();
     }
-
     return throwsError;
 }
 
@@ -306,91 +249,78 @@ bool ColorImage<float, C>::read(const std::string& fileName)
 template<ColorSpace C>
 void ColorImage<unsigned char, C>::write(const std::string& fileName) const
 {
-    int numValues = m_width * m_height * m_channels;
-    unsigned char* data = new unsigned char[numValues];
+	if (m_width == 0 && m_height == 0)
+	{
+		std::cerr << "Image cannot be written to " << fileName << ", because it is empty!" << std::endl;
+		return;
+	}
+	
+    std::vector<unsigned char> data(size() * m_channels);
 
-    // Convert to BGRA-order for OpenCV.
-    for (int i = 0; i < numValues; i += m_channels)
+    // Convert to BGRA-space for OpenCV.
+    for (unsigned i = 0; i < size(); ++i)
     {
-        data[i] = m_data[i + m_offsetB]; // Works for gray (since offset = 0)
+        // For 1 channel outside if, because grey-channel values
+        // are the same in each channel; does not matter which to copy.
+        data[(i * m_channels)] = m_data[B(i)];
         if (m_channels >= 3)
         {
-            data[i + 1] = m_data[i + m_offsetG];
-            data[i + 2] = m_data[i + m_offsetR];
+            data[(i * m_channels) + 1] = m_data[G(i)];
+            data[(i * m_channels) + 2] = m_data[R(i)];
         }
         if (m_channels == 4)
-        {
-            data[i + 3] = m_data[i + m_offsetA];
-        }
+            data[(i * m_channels) + 3] = m_data[A(i)];
     }
 
-    cv::Mat output(m_height, m_width, getCvType(C), data);
+    cv::Mat output(m_height, m_width, getCvType(C), data.data());
     cv::imwrite(fileName, output);
-
-    delete[] data;
 }
-
 
 template<ColorSpace C>
 void ColorImage<float, C>::write(const std::string& fileName) const
 {
-    int numValues = m_width * m_height * m_channels;
-    float* data = new float[numValues];
+	if (m_width == 0 && m_height == 0)
+	{
+		std::cerr << "Image cannot be written to " << fileName << ", because it is empty!" << std::endl;
+		return;
+	}
 
-    for (int i = 0; i < numValues; i += m_channels)
+    std::vector<float> data(size() * m_channels);
+
+    // Convert to BGRA-space for OpenCV.
+    for (unsigned i = 0; i < size(); ++i)
     {
-        data[i] = m_data[i + m_offsetB] * 255.0f;            // Works for gray (since offset = 0)
+        // For 1 channel outside if, because grey-channel values
+        // are the same in each channel; does not matter which to copy.
+        data[(i * m_channels)] = m_data[B(i)] * 255.0f;
         if (m_channels >= 3)
         {
-            data[i + 1] = m_data[i + m_offsetG] * 255.0f;
-            data[i + 2] = m_data[i + m_offsetR] * 255.0f;
+            data[(i * m_channels) + 1] = m_data[G(i)] * 255.0f;
+            data[(i * m_channels) + 2] = m_data[R(i)] * 255.0f;
         }
         if (m_channels == 4)
-        {
-            data[i + 3] = m_data[i + m_offsetA] * 255.0f;
-        }
+            data[(i * m_channels) + 3] = m_data[A(i)] * 255.0f;
     }
 
-    switch (C)
-    {
-        case ColorSpace::CS_RGB:
-        case ColorSpace::CS_BGR:
-        case ColorSpace::CS_HSV:
-            cv::imwrite(fileName, cv::Mat(m_height, m_width, CV_32FC3, data));
-            break;
-        case ColorSpace::CS_RGBA:
-        case ColorSpace::CS_BGRA:
-        case ColorSpace::CS_ARGB:
-            cv::imwrite(fileName, cv::Mat(m_height, m_width, CV_32FC4, data));
-            break;
-        case ColorSpace::CS_GRAY:
-            cv::imwrite(fileName, cv::Mat(m_height, m_width, CV_32FC1, data));
-            break;
-    }
-
-    delete[] data;
+    cv::Mat output(m_height, m_width, getCvType(C), data.data());
+    cv::imwrite(fileName, output);
 }
 
 
 template<ColorSpace C>
-void ColorImage<unsigned char, C>::copy(ColorImage* output) const
+void ColorImage<unsigned char, C>::copyTo(ColorImage* output) const
 {
-    // First compare width and height, than copy if the same.
-    if (compareDimensions(*output))
-    {
-        memcpy(output->m_data, m_data, m_allocatedMemory * sizeof(unsigned char));
-    }
+	output->m_width = m_width;
+	output->m_height = m_height;
+	output->m_data = m_data;
 }
 
-
 template<ColorSpace C>
-void ColorImage<float, C>::copy(ColorImage* output) const
+void ColorImage<float, C>::copyTo(ColorImage* output) const
 {
-    // First compare width and height, than copy if the same.
-    if (compareDimensions(*output))
-    {
-        memcpy(output->m_data, m_data, m_allocatedMemory * sizeof(float));
-    }
+    output->m_width = m_width;
+	output->m_height = m_height;
+	output->m_data = m_data;
 }
 
 
@@ -401,102 +331,45 @@ void ColorImage<unsigned char, C>::convertColorSpace(ColorImage<unsigned char, D
     output->m_width = m_width;
     output->m_height = m_height;
 
-    // Allocate new memory if old data array is too small
-    int neededMemory = m_width * m_height * output->getChannels();
-    if (neededMemory > output->m_allocatedMemory)
-    {
-        delete[] output->m_data;
-        output->m_data = new unsigned char[neededMemory];
-        output->m_allocatedMemory = neededMemory;
-    }
+	output->m_data.resize(m_width * m_height * output->m_channels);
 
     if (C == D)
-    {
-        memcpy(output->m_data, m_data, neededMemory * sizeof(unsigned char));
-    } else
-    {
-        // Case 1: Both images have same number of channels
-        if (m_channels == output->m_channels)
-        {
-            for (int i = 0; i<neededMemory; ++i)
-            {
-                // Simple memcpy() does not work here since channel order can be
-                // different.
-                output->m_data[i + output->m_offsetB] = m_data[i + m_offsetB];
-                if (output->m_channels >= 3)
-                {
-                    output->m_data[i + output->m_offsetG] = m_data[i + m_offsetG];
-                    output->m_data[i + output->m_offsetR] = m_data[i + m_offsetR];
-                }
-                if (output->m_channels == 4)
-                {
-                    output->m_data[i + output->m_offsetA] = m_data[i + m_offsetA];
-                }
-            }
-        }
-        // Case 2: source image has more channels
-        else if (m_channels> output->m_channels)
-        {
-            // if output is grey image, convert.
-            if (m_channels >= 3 && output->m_channels == 1)
-            {
-                int pixelOffset = 0;
-                float averageColor = 0;
-
-                for (int i = 0; i < neededMemory; ++i)
-                {
-                    // Calculate average color value and assign it.
-                    // TODO: Other weights (luminosity etc.) instead of just average color.
-                    averageColor = (m_data[pixelOffset + m_offsetB] +
-                                    m_data[pixelOffset + m_offsetG] +
-                                    m_data[pixelOffset + m_offsetR]) / 3.0f;
-                    output->m_data[i] =
-                        static_cast<unsigned char> (averageColor);
-                    pixelOffset += m_channels;
-                }
-            } // If source has 4 channels and output only 3, strip off alpha.
-            else if (m_channels == 4 && output->m_channels == 3)
-            {
-                int pixelOffset = 0;
-                for (int i = 0; i < neededMemory; i += output->m_channels)
-                {
-                    output->m_data[i + output->m_offsetB] = m_data[pixelOffset + m_offsetB];
-                    output->m_data[i + output->m_offsetG] = m_data[pixelOffset + m_offsetG];
-                    output->m_data[i + output->m_offsetR] = m_data[pixelOffset + m_offsetR];
-
-                    pixelOffset += m_channels;
-                }
-            }
-        }
-        // Case 3: source image has less channels than output image
-        else if (m_channels < output->m_channels)
-        {
-            int pixelOffset = 0;
-            for (int i = 0; i < neededMemory; i += output->m_channels)
-            {
-                output->m_data[i + output->m_offsetB] = m_data[pixelOffset + m_offsetB];
-                output->m_data[i + output->m_offsetG] = m_data[pixelOffset + m_offsetG];
-                output->m_data[i + output->m_offsetR] = m_data[pixelOffset + m_offsetR];
-
-                // if output image has alpha channel
-                if (output->m_channels == 4)
-                {
-                    output->m_data[i + output->m_offsetA] = 255;
-                }
-
-                pixelOffset += m_channels;
-            }
-        }
-    }
+	{
+        std::copy(m_data.begin(), m_data.end(), output->m_data.begin());
+		return;
+    }	
+	
+	for (unsigned i = 0; i < size(); ++i)
+	{
+		if (m_channels == output->m_channels)	// if both images have same number of channels
+		{
+			output->setPixelColor(i, m_data[R(i)], 
+									 m_data[G(i)], 
+									 m_data[B(i)], 
+									 m_data[A(i)]);
+		}
+		else if (output->m_channels == 1)		// input.m_channels is implicitly greater than output's
+		{
+			float averageColor = 0;
+			// Calculate average color value and assign it.
+			// TODO: Other weights (luminosity etc.) instead of just average color.
+			averageColor = (  m_data[B(i)] 
+							+ m_data[G(i)] 
+							+ m_data[R(i)]) / 3.0f;
+			unsigned char avgColor = static_cast<unsigned char>(averageColor);
+			output->setPixelColor(i, avgColor, avgColor, avgColor);
+		}
+		else									// in all other cases the alpha is either dismissed or set to default value
+		{
+			output->setPixelColor(i, m_data[R(i)], m_data[G(i)], m_data[B(i)]);
+		}	
+	}    
 
     // If needed, convert from/to HSV based system.
     if (C == ColorSpace::CS_HSV && D != ColorSpace::CS_HSV)
-    {
         output->convertFromHsv();
-    } else if (C != ColorSpace::CS_HSV && D == ColorSpace::CS_HSV)
-    {
+	else if (C != ColorSpace::CS_HSV && D == ColorSpace::CS_HSV)
         output->convertToHsv();
-    }
 }
 
 
@@ -508,106 +381,44 @@ void ColorImage<float, C>::convertColorSpace(
     output->m_width = m_width;
     output->m_height = m_height;
 
-    // Allocate new memory if old data array is too small
-    int neededMemory = m_width * m_height * output->m_channels;
-
-    if (neededMemory > output->m_allocatedMemory)
-    {
-        delete[] output->m_data;
-        output->m_data = new float[neededMemory];
-        output->m_allocatedMemory = neededMemory;
-    }
+	output->m_data.resize(m_width * m_height * output->m_channels);
 
     if (C == D)
-    {
-        memcpy(output->m_data, m_data, neededMemory * sizeof(float));
-    } else
-    {
-        // Case 1: Both images have same number of channels
-        if (m_channels == output->m_channels)
-        {
-            for (int i = 0; i < neededMemory; i += m_channels)
-            {
-                // Simple memcpy() does not work here since channel order can be
-                // different.
-                output->m_data[i + output->m_offsetB] = m_data[i + m_offsetB];
-                if (output->m_channels >= 3)
-                {
-                    output->m_data[i + output->m_offsetG] = m_data[i + m_offsetG];
-                    output->m_data[i + output->m_offsetR] = m_data[i + m_offsetR];
-                }
-                if (output->m_channels == 4)
-                {
-                    output->m_data[i + output->m_offsetA] = m_data[i + m_offsetA];
-                }
-            }
-        }
-        // Case 2: source image has more channels
-        else if (m_channels> output->m_channels)
-        {
-            // if output is grey image, convert.
-            if (m_channels >= 3 && output->m_channels == 1)
-            {
-                int pixelOffset = 0;
-                float averageColor = 0;
-
-                for (int i = 0; i < neededMemory; ++i)
-                {
-                    // Calculate average color value and assign it.
-                    // TODO: Other weights (luminosity etc.) instead of just average color.
-                    averageColor = (m_data[pixelOffset + m_offsetB] +
-                                    m_data[pixelOffset + m_offsetG] +
-                                    m_data[pixelOffset + m_offsetR]) / 3.0f;
-                    output->m_data[i] = averageColor;
-                    pixelOffset += m_channels;
-                }
-            }
-            // If source has 4 channels and output only 3, strip off alpha.
-            else if (m_channels == 4 && output->m_channels == 3)
-            {
-                int pixelOffset = 0;
-                for (int i = 0; i < neededMemory; i += output->m_channels)
-                {
-                    output->m_data[i + output->m_offsetB] =
-                        m_data[pixelOffset + m_offsetB];
-                    output->m_data[i + output->m_offsetG] =
-                        m_data[pixelOffset + m_offsetG];
-                    output->m_data[i + output->m_offsetR] =
-                        m_data[pixelOffset + m_offsetR];
-
-                    pixelOffset += m_channels;
-                }
-            }
-        }
-        // Case 3: source image has less channels than output image
-        else if (m_channels < output->m_channels)
-        {
-            int pixelOffset = 0;
-            for (int i = 0; i < neededMemory; i += output->m_channels)
-            {
-                output->m_data[i + output->m_offsetB] = m_data[pixelOffset + m_offsetB];
-                output->m_data[i + output->m_offsetG] = m_data[pixelOffset + m_offsetG];
-                output->m_data[i + output->m_offsetR] = m_data[pixelOffset + m_offsetR];
-
-                // if output image has alpha channel
-                if (output->m_channels == 4)
-                {
-                    output->m_data[i + output->m_offsetA] = 1.0f;
-                }
-
-                pixelOffset += m_channels;
-            }
-        }
-    }
+	{
+        std::copy(m_data.begin(), m_data.end(), output->m_data.begin());
+		return;
+    }	
+	
+	for (unsigned i = 0; i < size(); ++i)
+	{
+		if (m_channels == output->m_channels)	// if both images have same number of channels
+		{
+			output->setPixelColor(i, m_data[R(i)], 
+									 m_data[G(i)], 
+									 m_data[B(i)], 
+									 m_data[A(i)]);
+		}
+		else if (output->m_channels == 1)		// input.m_channels is implicitly greater than output's
+		{
+			float averageColor = 0;
+			// Calculate average color value and assign it.
+			// TODO: Other weights (luminosity etc.) instead of just average color.
+			averageColor = (  m_data[B(i)] 
+							+ m_data[G(i)] 
+							+ m_data[R(i)]) / 3.0f;
+			output->setPixelColor(i, averageColor, averageColor, averageColor);
+		}
+		else									// in all other cases the alpha is either dismissed or set to default value
+		{
+			output->setPixelColor(i, m_data[R(i)], m_data[G(i)], m_data[B(i)]);
+		}	
+	}  
 
     // If needed, convert from/to HSV based system or from/to Lab.
     if (C == ColorSpace::CS_HSV && D != ColorSpace::CS_HSV)
-    {
         output->convertFromHsv();
-    } else if (C != ColorSpace::CS_HSV && D == ColorSpace::CS_HSV)
-    {
+    else if (C != ColorSpace::CS_HSV && D == ColorSpace::CS_HSV)
         output->convertToHsv();
-    }
 }
 
 
@@ -617,15 +428,10 @@ void ColorImage<unsigned char, C>::convertType(
 {
     output->m_width = m_width;
     output->m_height = m_height;
-    output->m_allocatedMemory = m_allocatedMemory;
+	output->m_data.resize(m_width * m_height * m_channels);
 
-    delete[] output->m_data;
-    output->m_data = new float[m_allocatedMemory];
-
-    for (int i = 0; i < m_allocatedMemory; ++i)
-    {
+    for (int i = 0; i < output->m_data.size(); ++i)
         output->m_data[i] = m_data[i] / 255.0f;
-    }
 }
 
 
@@ -635,43 +441,10 @@ void ColorImage<float, C>::convertType(
 {
     output->m_width = m_width;
     output->m_height = m_height;
-    output->m_allocatedMemory = m_allocatedMemory;
+	output->m_data = m_data;
 
-    delete[] output->m_data;
-    output->m_data = new unsigned char[m_allocatedMemory];
-
-    for (int i = 0; i < m_allocatedMemory; ++i)
-    {
+    for (int i = 0; i < output->m_data.size(); ++i)
         output->m_data[i] = static_cast<unsigned char>(m_data[i] * 255.0f);
-    }
-}
-
-
-template<ColorSpace C> template<typename U, ColorSpace D>
-bool ColorImage<unsigned char, C>::compareDimensions(
-    const ColorImage<U, D>& other) const
-{
-    bool sameDimensions = false;
-    if (m_width == other.getWidth() &&
-        m_height == other.getHeight())
-    {
-        sameDimensions = true;
-    }
-    return sameDimensions;
-}
-
-
-template<ColorSpace C> template<typename U, ColorSpace D>
-bool ColorImage<float, C>::compareDimensions(
-    const ColorImage<U, D>& other) const
-{
-    bool sameDimensions = false;
-    if (m_width == other.getWidth()
-        && m_height == other.getHeight())
-    {
-        sameDimensions = true;
-    }
-    return sameDimensions;
 }
 
 
@@ -680,30 +453,71 @@ void ColorImage<unsigned char, C>::resize(int width, int height)
 {
     m_width = width;
     m_height = height;
-
-    int neededMemory = m_width * m_height * m_channels;
-    if (neededMemory > m_allocatedMemory)
-    {
-        delete[] m_data;
-        m_data = new unsigned char[neededMemory];
-        m_allocatedMemory = neededMemory;
-    }
+	m_data.resize(m_width * m_height * m_channels);
 }
-
 
 template<ColorSpace C>
 void ColorImage<float, C>::resize(int width, int height)
 {
     m_width = width;
     m_height = height;
+	m_data.resize(m_width * m_height * m_channels);
+}
 
-    int neededMemory = m_width * m_height * m_channels;
-    if (neededMemory > m_allocatedMemory)
-    {
-        delete[] m_data;
-        m_data = new float[neededMemory];
-        m_allocatedMemory = neededMemory;
-    }
+
+template<ColorSpace C> template<typename U, ColorSpace D>
+bool ColorImage<unsigned char, C>::sameSize(
+	const ColorImage<U, D>& other) const
+{
+    if (m_width == other.getWidth() && m_height == other.getHeight())
+        return true;
+	
+	return false;
+}
+
+template<ColorSpace C> template<typename U, ColorSpace D>
+bool ColorImage<float, C>::sameSize(
+    const ColorImage<U, D>& other) const
+{
+	if (m_width == other.getWidth() && m_height == other.getHeight())
+		return true;
+	
+	return false;
+}
+
+
+template<ColorSpace C>
+void ColorImage<unsigned char, C>::setPixelColor(int pixelIdx,
+										 unsigned char r,
+										 unsigned char g /* = r */,
+										 unsigned char b /* = r */,
+										 unsigned char a /* = 255 */)
+{
+	m_data[B(pixelIdx)] = b;
+	if (m_channels >= 3) 
+	{
+		m_data[G(pixelIdx)] = g;
+		m_data[R(pixelIdx)] = r;
+	}
+	if (m_channels == 4)
+		m_data[A(pixelIdx)] = a;
+}
+
+template<ColorSpace C>
+void ColorImage<float, C>::setPixelColor(int pixelIdx,
+										 float r,
+										 float g /* = r */,
+										 float b /* = r */,
+										 float a /* = 1.0f */)
+{
+	m_data[B(pixelIdx)] = b;
+	if (m_channels >= 3) 
+	{
+		m_data[G(pixelIdx)] = g;
+		m_data[R(pixelIdx)] = r;
+	}
+	if (m_channels == 4)
+		m_data[A(pixelIdx)] = a;
 }
 
 
@@ -741,14 +555,8 @@ void ColorImage<unsigned char, C>::setToValue(unsigned char r,
                                               unsigned char b,
                                               unsigned char a /* = 255 */)
 {
-    // FIX: Performance-Hit when less than 4 channels (too much assignments)
-    for (int i = 0; i < m_width * m_height * m_channels; i += m_channels) 
-    {
-        m_data[i + m_offsetR] = r;
-        m_data[i + m_offsetG] = g;
-        m_data[i + m_offsetB] = b;
-        m_data[i + m_offsetA] = a;
-    }
+    for (unsigned i = 0; i < size(); ++i) 
+        setPixelColor(i, r, g, b, a);
 }
 
 
@@ -758,21 +566,15 @@ void ColorImage<float, C>::setToValue(float r,
                                       float b,
                                       float a /* = 1.0f */) 
 {
-    // FIX: Performance-Hit when less than 4 channels (too much assignments)
-    for (int i = 0; i < m_width * m_height * m_channels; i += m_channels) 
-    {
-        m_data[i + m_offsetR] = r;
-        m_data[i + m_offsetG] = g;
-        m_data[i + m_offsetB] = b;
-        m_data[i + m_offsetA] = a;
-    }
+    for (unsigned i = 0; i < size(); i += m_channels) 
+        setPixelColor(i, r, g, b, a);
 }
 
 
 template<ColorSpace C>
-int ColorImage<unsigned char, C>::R(int pixelNo) const
+int ColorImage<unsigned char, C>::R(int pixelIdx) const
 {
-    return pixelNo * m_channels + m_offsetR;
+    return pixelIdx * m_channels + m_offsetR;
 }
 
 
@@ -784,9 +586,9 @@ int ColorImage<unsigned char, C>::R(int x, int y) const
 
 
 template<ColorSpace C>
-int ColorImage<float, C>::R(int pixelNo) const
+int ColorImage<float, C>::R(int pixelIdx) const
 {
-    return pixelNo * m_channels + m_offsetR;
+    return pixelIdx * m_channels + m_offsetR;
 }
 
 
@@ -798,9 +600,9 @@ int ColorImage<float, C>::R(int x, int y) const
 
 
 template<ColorSpace C>
-int ColorImage<unsigned char, C>::G(int pixelNo) const
+int ColorImage<unsigned char, C>::G(int pixelIdx) const
 {
-    return pixelNo * m_channels + m_offsetG;
+    return pixelIdx * m_channels + m_offsetG;
 }
 
 
@@ -812,9 +614,9 @@ int ColorImage<unsigned char, C>::G(int x, int y) const
 
 
 template<ColorSpace C>
-int ColorImage<float, C>::G(int pixelNo) const
+int ColorImage<float, C>::G(int pixelIdx) const
 {
-    return pixelNo * m_channels + m_offsetG;
+    return pixelIdx * m_channels + m_offsetG;
 }
 
 
@@ -826,9 +628,9 @@ int ColorImage<float, C>::G(int x, int y) const
 
 
 template<ColorSpace C>
-int ColorImage<unsigned char, C>::B(int pixelNo) const
+int ColorImage<unsigned char, C>::B(int pixelIdx) const
 {
-    return pixelNo * m_channels + m_offsetB;
+    return pixelIdx * m_channels + m_offsetB;
 }
 
 
@@ -840,9 +642,9 @@ int ColorImage<unsigned char, C>::B(int x, int y) const
 
 
 template<ColorSpace C>
-int ColorImage<float, C>::B(int pixelNo) const
+int ColorImage<float, C>::B(int pixelIdx) const
 {
-    return pixelNo * m_channels + m_offsetB;
+    return pixelIdx * m_channels + m_offsetB;
 }
 
 
@@ -854,9 +656,9 @@ int ColorImage<float, C>::B(int x, int y) const
 
 
 template<ColorSpace C>
-int ColorImage<unsigned char, C>::A(int pixelNo) const
+int ColorImage<unsigned char, C>::A(int pixelIdx) const
 {
-    return pixelNo * m_channels + m_offsetA;
+    return pixelIdx * m_channels + m_offsetA;
 }
 
 
@@ -868,9 +670,9 @@ int ColorImage<unsigned char, C>::A(int x, int y) const
 
 
 template<ColorSpace C>
-int ColorImage<float, C>::A(int pixelNo) const
+int ColorImage<float, C>::A(int pixelIdx) const
 {
-    return pixelNo * m_channels + m_offsetA;
+    return pixelIdx * m_channels + m_offsetA;
 }
 
 
@@ -882,9 +684,9 @@ int ColorImage<float, C>::A(int x, int y) const
 
 
 template<ColorSpace C>
-int ColorImage<unsigned char, C>::H(int pixelNo) const
+int ColorImage<unsigned char, C>::H(int pixelIdx) const
 {
-    return pixelNo * m_channels + m_offsetR;
+    return pixelIdx * m_channels + m_offsetR;
 }
 
 
@@ -896,9 +698,9 @@ int ColorImage<unsigned char, C>::H(int x, int y) const
 
 
 template<ColorSpace C>
-int ColorImage<float, C>::H(int pixelNo) const
+int ColorImage<float, C>::H(int pixelIdx) const
 {
-    return pixelNo * m_channels + m_offsetR;
+    return pixelIdx * m_channels + m_offsetR;
 }
 
 
@@ -910,9 +712,9 @@ int ColorImage<float, C>::H(int x, int y) const
 
 
 template<ColorSpace C>
-int ColorImage<unsigned char, C>::S(int pixelNo) const
+int ColorImage<unsigned char, C>::S(int pixelIdx) const
 {
-    return pixelNo * m_channels + m_offsetG;
+    return pixelIdx * m_channels + m_offsetG;
 }
 
 
@@ -924,9 +726,9 @@ int ColorImage<unsigned char, C>::S(int x, int y) const
 
 
 template<ColorSpace C>
-int ColorImage<float, C>::S(int pixelNo) const
+int ColorImage<float, C>::S(int pixelIdx) const
 {
-    return pixelNo * m_channels + m_offsetG;
+    return pixelIdx * m_channels + m_offsetG;
 }
 
 
@@ -938,9 +740,9 @@ int ColorImage<float, C>::S(int x, int y) const
 
 
 template<ColorSpace C>
-int ColorImage<unsigned char, C>::V(int pixelNo) const
+int ColorImage<unsigned char, C>::V(int pixelIdx) const
 {
-    return pixelNo * m_channels + m_offsetB;
+    return pixelIdx * m_channels + m_offsetB;
 }
 
 
@@ -952,9 +754,9 @@ int ColorImage<unsigned char, C>::V(int x, int y) const
 
 
 template<ColorSpace C>
-int ColorImage<float, C>::V(int pixelNo) const
+int ColorImage<float, C>::V(int pixelIdx) const
 {
-    return pixelNo * m_channels + m_offsetB;
+    return pixelIdx * m_channels + m_offsetB;
 }
 
 
@@ -1042,7 +844,8 @@ template<ColorSpace C>
 void ColorImage<unsigned char, C>::convertToHsv()
 {
     float h, s, v;
-    for (int i = 0; i < m_width * m_height; ++i)
+	unsigned size = this->size();
+    for (unsigned i = 0; i < size; ++i)
     {
         convertColorToHsv(m_data[R(i)] / 255.0f, // Since conversion-function
                           m_data[G(i)] / 255.0f, // takes floats, we must di-
@@ -1050,9 +853,9 @@ void ColorImage<unsigned char, C>::convertToHsv()
                           &h, &s, &v);
 
         /* Since the data is in unsigned char, we must map the floats accor-
-        dingly. Saturation and value shall be in range [0,255], and hue in
-        range [0,180] (because unsigned char cannot go to 360) => this fol-
-        lows the OpenCV-convention for HSV.*/
+         * dingly. Saturation and value shall be in range [0,255], and hue in
+         * range [0,180] (because unsigned char cannot go to 360) => this fol-
+         * lows the OpenCV-convention for HSV. */
         m_data[R(i)] = static_cast<unsigned char> (h / 2);
         m_data[G(i)] = static_cast<unsigned char> (s * 255);
         m_data[B(i)] = static_cast<unsigned char> (v * 255);
@@ -1064,9 +867,13 @@ template<ColorSpace C>
 void ColorImage<float, C>::convertToHsv()
 {
     float h, s, v;
-    for (int i = 0; i < m_width * m_height; ++i)
+	unsigned size = this->size();
+    for (unsigned i = 0; i < size; ++i)
     {
-        convertColorToHsv(m_data[R(i)], m_data[G(i)], m_data[B(i)], &h, &s, &v);
+        convertColorToHsv(m_data[R(i)], 
+						  m_data[G(i)],
+						  m_data[B(i)],
+						  &h, &s, &v);
 
         m_data[R(i)] = h / 360.0f;  // Normalizing the hue value.
         m_data[G(i)] = s;
@@ -1079,7 +886,7 @@ template<ColorSpace C>
 void ColorImage<unsigned char, C>::convertFromHsv()
 {
     float r, g, b;
-    for (int i = 0; i < m_width * m_height; ++i)
+    for (unsigned i = 0; i < m_width * m_height; ++i)
     {
         convertColorFromHsv(m_data[H(i)] * 2.0f, // Conversion function ex-
                             m_data[S(i)] / 255.0f, // pects hue in range from
@@ -1099,7 +906,7 @@ template<ColorSpace C>
 void ColorImage<float, C>::convertFromHsv()
 {
     float r, g, b;
-    for (int i = 0; i < m_width * m_height; ++i)
+    for (unsigned i = 0; i < size(); ++i)
     {
         convertColorFromHsv(m_data[H(i)] * 360.0f,
                             m_data[S(i)],
@@ -1139,11 +946,13 @@ void ColorImage<unsigned char, C>::convertColorToHsv(float r, float g,
         *s = 0.0f;
 
     // Calculate hue value
-    if (*s == 0.0f)
+    if (*s == 0.0f)	
+	{
         // Hue is undefined here, so we just assign 0.
         *h = 0.0f;
-    else
-    {
+	} 
+	else 
+	{
         float delta = max - min;
         if (r == max)
             *h = (g - b) / delta;
@@ -1176,19 +985,17 @@ void ColorImage<float, C>::convertColorToHsv(float  r, float  g, float  b,
 
     // Calculate saturation value
     if (max != 0.0f)
-    {
         *s = (max - min) / max;
-    } else
-    {
+    else
         *s = 0.0f;
-    }
 
     // Calculate hue value
     if (*s == 0.0f)
     {
         // Hue is undefined here, so we just assign 0.
         *h = 0.0f;
-    } else
+    } 
+	else
     {
         float delta = max - min;
         if (r == max)
@@ -1206,9 +1013,12 @@ void ColorImage<float, C>::convertColorToHsv(float  r, float  g, float  b,
 
 
 template<ColorSpace C>
-void ColorImage<unsigned char, C>::convertColorFromHsv(float h, float s,
-                                                       float v, float* r,
-                                                       float* g, float* b)
+void ColorImage<unsigned char, C>::convertColorFromHsv(float h,
+													   float s,
+                                                       float v,
+													   float* r,
+                                                       float* g,
+													   float* b)
 {
     /* This code is based on Daniel Mohr's version, which again is based on
     the approach presented in Computer Graphics: Principles and
@@ -1222,19 +1032,22 @@ void ColorImage<unsigned char, C>::convertColorFromHsv(float h, float s,
             *r = v;
             *g = v;
             *b = v;
-        } else
+        } 
+		else
         {
-            std::cout << "HSV -> RGB conversion error (s == 0 and h> 0)\n" <<
-                std::endl;
+            std::cerr << "HSV -> RGB conversion error (s == 0 and h > 0)\n" 
+					  << std::endl;
             exit(1);
         }
-    } else
+    } 
+	else
     {
         float f, p, q, t;
         int i;
 
         if (h == 360.0)
             h = 0.0;
+
         h /= 60;
         i = static_cast<int> (std::floor(h));
         f = h - i;
@@ -1295,13 +1108,15 @@ void ColorImage<float, C>::convertColorFromHsv(float  h, float  s, float  v,
             *r = v;
             *g = v;
             *b = v;
-        } else
+        } 
+		else
         {
             std::cout << "HSV -> RGB conversion error (s == 0 and h> 0)\n" <<
                 std::endl;
             exit(1);
         }
-    } else
+    } 
+	else
     {
         float f, p, q, t;
         int i;
@@ -1366,8 +1181,13 @@ void ColorImage<float, C>::convertToLab()
     int numPixels = m_width * m_height;
     for (int i = 0; i < numPixels; ++i)
     {
-        convertColorToLab(m_data[R(i)], m_data[G(i)], m_data[B(i)],
-                          &lab[0], &lab[1], &lab[2]);
+        convertColorToLab(m_data[R(i)],
+						  m_data[G(i)],
+						  m_data[B(i)],
+                          &lab[0],
+						  &lab[1],
+						  &lab[2]);
+
         m_data[R(i)] = lab[0];
         m_data[G(i)] = lab[1];
         m_data[B(i)] = lab[2];
@@ -1382,7 +1202,9 @@ void ColorImage<float, C>::convertFromLab()
     float r, g, b;
     for (int i = 0; i < m_width * m_height; ++i)
     {
-        convertColorFromLab(m_data[R(i)], m_data[G(i)], m_data[B(i)],
+        convertColorFromLab(m_data[R(i)],
+							m_data[G(i)],
+							m_data[B(i)],
                             &r, &g, &b);
 
         // Since the data is in unsigned char, we must map the floats
@@ -1447,12 +1269,12 @@ void ColorImage<float, C>::convertColorFromLab(float lIn, float aIn, float bIn,
     bool zr = z > (6.0f / 29.0f);
 
     // Use inverse from function f from forward conversion.
-    float fInverseX = xr ? std::pow(x, 3.0f) :
-        ((108.0f / 841.0f) * (x - (4.0f / 29.0f)));
-    float fInverseY = yr ? std::pow(y, 3.0f) :
-        ((108.0f / 841.0f) * (y - (4.0f / 29.0f)));
-    float fInverseZ = zr ? std::pow(z, 3.0f) :
-        ((108.0f / 841.0f) * (y - (4.0f / 29.0f)));
+    float fInverseX = xr ? 
+		std::pow(x, 3.0f) : ((108.0f / 841.0f) * (x - (4.0f / 29.0f)));
+    float fInverseY = yr ?
+		std::pow(y, 3.0f) : ((108.0f / 841.0f) * (y - (4.0f / 29.0f)));
+    float fInverseZ = zr ? 
+		std::pow(z, 3.0f) : ((108.0f / 841.0f) * (y - (4.0f / 29.0f)));
 
     x = X_WHITE * fInverseX;
     y = Y_WHITE * fInverseY;
@@ -1468,74 +1290,37 @@ void ColorImage<float, C>::convertColorFromLab(float lIn, float aIn, float bIn,
 template<ColorSpace C>
 bool ColorImage<unsigned char, C>::readCv(const std::string& fileName)
 {
-    // Load image
     cv::Mat cvImage = cv::imread(fileName, cv::IMREAD_UNCHANGED);
-
-    // If image was not loaded (wrong format etc.), then exit
     if (cvImage.empty())
     {
-        std::cout << "ERROR: OpenCV failed to load file " << fileName << ".\n";
+        std::cerr << "ERROR: OpenCV failed to load file " << fileName << ".\n";
         return false;
     }
 
-    // Check if image has same number of channels as ColorImage instance
     if (cvImage.channels() != m_channels)
     {
-        std::cout << "ERROR: Image does not have compatible number of channels!\n";
-        std::cout << "(Expected " << m_channels << " channels, but file has " <<
-            cvImage.channels() << " channels.)\n";
+        std::cerr << "ERROR: Image does not have compatible number of channels!\n"
+		  << "(Expected " << m_channels << " channels, but file has "
+		  << cvImage.channels() << " channels.)" 
+                  << std::endl;
         return false;
     }
 
-    // If needed memory for new image exceeds already allocated memory
-    int neededMemory = cvImage.size().width * cvImage.size().height *
-        cvImage.channels();
-
-    if (neededMemory > m_allocatedMemory)
-    {
-        delete[] m_data;
-        m_data = new unsigned char[neededMemory];
-        m_allocatedMemory = neededMemory;
-    }
-
-    m_width = cvImage.size().width;
+    m_width  = cvImage.size().width;
     m_height = cvImage.size().height;
+    m_data.resize(m_width * m_height * m_channels);
 
-    // Copy data from cvImage
     unsigned char* data = cvImage.data;
 
-    // Because data in cvImage is not consecutive / "step into next scanline"
-    int step = static_cast<int>(cvImage.step);
+    for (unsigned i = 0; i < size(); ++i) 
+	{
+        // BUG: Not actually a bug, but unnecessary: we pass some values
+		// as parameters, even though they might not be used (e.g. alpha value
+		// in 3-channel-image.
+		setPixelColor(i, data[2], data[1], data[0], data[3]);	// in this order because cvIMage is BGR(A) space
+		data += m_channels;
+	}
 
-    // Width in Pixel * Number of Channels
-    int numberColumns = cvImage.size().width * cvImage.channels();
-
-    // Goes through all color values of cvImage and copies over values into 
-    // array. No scale is applied because of unsigned char specialization.
-    int pixelNo = 0;
-    for (int i = 0; i < cvImage.size().height; ++i)
-    {
-        for (int j = 0; j < numberColumns; j += cvImage.channels())
-        {
-
-            if (cvImage.channels() == 1) // e.g. grey-scale image
-            {
-                m_data[pixelNo] = data[j];
-                ++pixelNo;
-            } else if (cvImage.channels() >= 3) // e.g. RGB
-            {
-                m_data[B(pixelNo)] = data[j];
-                m_data[G(pixelNo)] = data[j + 1];
-                m_data[R(pixelNo)] = data[j + 2];
-                if (cvImage.channels() == 4) // e.g. RGBA
-                {
-                    m_data[A(pixelNo)] = data[j + 3];
-                }
-                ++pixelNo;
-            }
-        }
-        data += step;
-    }
     return true;
 }
 
@@ -1543,78 +1328,43 @@ bool ColorImage<unsigned char, C>::readCv(const std::string& fileName)
 template<ColorSpace C>
 bool ColorImage<float, C>::readCv(const std::string& fileName)
 {
-    // Load image
     cv::Mat cvImage = cv::imread(fileName, cv::IMREAD_UNCHANGED);
-
-    // If image was not loaded (wrong format etc.), then exit
     if (cvImage.empty())
     {
-        std::cout << "ERROR: OpenCV failed to load file " << fileName << ".\n";
+        std::cerr << "ERROR: OpenCV failed to load file " << fileName << ".\n";
         return false;
     }
 
-    // Check if image has same number of channels as ColorImage instance
     if (cvImage.channels() != m_channels)
     {
-        std::cout << "ERROR: Image does not have compatible number of channels!\n";
-        std::cout << "(Expected " << m_channels << " channels, but file has " <<
-            cvImage.channels() << " channels.)\n";
+        std::cerr << "ERROR: Image does not have compatible number of channels!\n"
+		  << "(Expected " << m_channels << " channels, but file has "
+		  << cvImage.channels() << " channels.)" 
+                  << std::endl;
         return false;
     }
 
-    // If needed memory for new image exceeds already allocated memory
-    int neededMemory = cvImage.size().width *
-        cvImage.size().height *
-        cvImage.channels();
-
-    if (neededMemory > m_allocatedMemory)
-    {
-        delete[] m_data;
-        m_data = new float[neededMemory];
-        m_allocatedMemory = neededMemory;
-    }
-
-    m_width = cvImage.size().width;
+    m_width  = cvImage.size().width;
     m_height = cvImage.size().height;
+    m_data.resize(m_width * m_height * m_channels);
 
-    // Copy data from cvImage
     unsigned char* data = cvImage.data;
+    // TODO(Ralf): Was needed before, now it reads them incorrectly if this is enabled?
+    //// step alignment into next scan line
+    // int step = static_cast<int>(cvImage.step);
 
-    // Because data in cvImage is not consecutive / "step into next scanline"
-    int step = static_cast<int>(cvImage.step);
+    for (unsigned i = 0; i < size(); ++i) 
+	{
+        // BUG: Not actually a bug, but unnecessary: we pass some values
+		// as parameters, even though they might not be used (e.g. alpha value
+		// in 3-channel-image.
+		setPixelColor(i, data[2] / 255.0f, 
+			             data[1] / 255.0f, 
+						 data[0] / 255.0f, 
+						 data[3] / 255.0f);	// in this order because cvIMage is BGR(A) space
+		data += m_channels;
+	}
 
-    // Width in Pixel * Number of Channels
-    int numberColumns = cvImage.size().width * cvImage.channels();
-
-    // Goes through all color values of cvImage and copies over values into 
-    // array. No scale is applied because of unsigned char specialization.
-    int pixelNo = 0;
-    for (int i = 0; i < cvImage.size().height; ++i)
-    {
-        for (int j = 0; j < numberColumns; j += cvImage.channels())
-        {
-
-            if (cvImage.channels() == 1)
-            {          // e.g. grey-scale image
-                m_data[pixelNo] = data[j] / 255.0f;
-
-                ++pixelNo;
-            } else if (cvImage.channels() >= 3)
-            {     // e.g. RGB
-                m_data[B(pixelNo)] = data[j] / 255.0f;
-                m_data[G(pixelNo)] = data[j + 1] / 255.0f;
-                m_data[R(pixelNo)] = data[j + 2] / 255.0f;
-
-                if (cvImage.channels() == 4)
-                {        // e.g. RGBA
-                    m_data[A(pixelNo)] = data[j + 3] / 255.0f;
-                }
-
-                ++pixelNo;
-            }
-        }
-        data += step;
-    }
     return true;
 }
 
