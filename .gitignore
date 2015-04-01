@@ -5,7 +5,7 @@
 
 [Oo]pencv/
 
-#Depth Image test format
+#Depth Image Test Format
 *.dat
 
 ## Ignore Visual Studio temporary files, build results, and
