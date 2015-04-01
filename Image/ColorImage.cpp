@@ -8,23 +8,23 @@ int ColorImage<unsigned char, C>::getNumberOfChannels(
 {
     switch (colorSpace)
     {
-        case ColorSpace::CS_RGB:
-        case ColorSpace::CS_BGR:
-        case ColorSpace::CS_HSV:
-        case ColorSpace::CS_LAB:
-            return 3;
-            break;
-        case ColorSpace::CS_RGBA:
-        case ColorSpace::CS_BGRA:
-        case ColorSpace::CS_ARGB:
-            return 4;
-            break;
-        case ColorSpace::CS_GRAY:
-            return 1;
-            break;
-        default:
-            return 0;
-            break;
+    case ColorSpace::CS_RGB:
+    case ColorSpace::CS_BGR:
+    case ColorSpace::CS_HSV:
+    case ColorSpace::CS_LAB:
+        return 3;
+        break;
+    case ColorSpace::CS_RGBA:
+    case ColorSpace::CS_BGRA:
+    case ColorSpace::CS_ARGB:
+        return 4;
+        break;
+    case ColorSpace::CS_GRAY:
+        return 1;
+        break;
+    default:
+        return 0;
+        break;
     }
 }
 
@@ -35,23 +35,23 @@ int ColorImage<float, C>::getNumberOfChannels(
 {
     switch (colorSpace)
     {
-        case ColorSpace::CS_RGB:
-        case ColorSpace::CS_BGR:
-        case ColorSpace::CS_HSV:
-        case ColorSpace::CS_LAB:
-            return 3;
-            break;
-        case ColorSpace::CS_RGBA:
-        case ColorSpace::CS_BGRA:
-        case ColorSpace::CS_ARGB:
-            return 4;
-            break;
-        case ColorSpace::CS_GRAY:
-            return 1;
-            break;
-        default:
-            return 0;
-            break;
+    case ColorSpace::CS_RGB:
+    case ColorSpace::CS_BGR:
+    case ColorSpace::CS_HSV:
+    case ColorSpace::CS_LAB:
+        return 3;
+        break;
+    case ColorSpace::CS_RGBA:
+    case ColorSpace::CS_BGRA:
+    case ColorSpace::CS_ARGB:
+        return 4;
+        break;
+    case ColorSpace::CS_GRAY:
+        return 1;
+        break;
+    default:
+        return 0;
+        break;
     }
 }
 
@@ -61,23 +61,23 @@ int ColorImage<unsigned char, C>::getCvType(const ColorSpace colorSpace)
 {
     switch (colorSpace)
     {
-        case ColorSpace::CS_RGB:
-        case ColorSpace::CS_BGR:
-        case ColorSpace::CS_HSV:
-        case ColorSpace::CS_LAB:
-            return CV_8UC3;
-            break;
-        case ColorSpace::CS_RGBA:
-        case ColorSpace::CS_BGRA:
-        case ColorSpace::CS_ARGB:
-            return CV_8UC4;
-            break;
-        case ColorSpace::CS_GRAY:
-            return CV_8UC1;
-            break;
-        default:
-            return 0;
-            break;
+    case ColorSpace::CS_RGB:
+    case ColorSpace::CS_BGR:
+    case ColorSpace::CS_HSV:
+    case ColorSpace::CS_LAB:
+        return CV_8UC3;
+        break;
+    case ColorSpace::CS_RGBA:
+    case ColorSpace::CS_BGRA:
+    case ColorSpace::CS_ARGB:
+        return CV_8UC4;
+        break;
+    case ColorSpace::CS_GRAY:
+        return CV_8UC1;
+        break;
+    default:
+        return 0;
+        break;
     }
 }
 
@@ -87,23 +87,23 @@ int ColorImage<float, C>::getCvType(const ColorSpace colorSpace)
 {
     switch (colorSpace)
     {
-        case ColorSpace::CS_RGB:
-        case ColorSpace::CS_BGR:
-        case ColorSpace::CS_HSV:
-        case ColorSpace::CS_LAB:
-            return CV_32FC3;
-            break;
-        case ColorSpace::CS_RGBA:
-        case ColorSpace::CS_BGRA:
-        case ColorSpace::CS_ARGB:
-            return CV_32FC4;
-            break;
-        case ColorSpace::CS_GRAY:
-            return CV_32FC1;
-            break;
-        default:
-            return 0;
-            break;
+    case ColorSpace::CS_RGB:
+    case ColorSpace::CS_BGR:
+    case ColorSpace::CS_HSV:
+    case ColorSpace::CS_LAB:
+        return CV_32FC3;
+        break;
+    case ColorSpace::CS_RGBA:
+    case ColorSpace::CS_BGRA:
+    case ColorSpace::CS_ARGB:
+        return CV_32FC4;
+        break;
+    case ColorSpace::CS_GRAY:
+        return CV_32FC1;
+        break;
+    default:
+        return 0;
+        break;
     }
 }
 
@@ -118,14 +118,14 @@ int ColorImage<float, C>::getCvType(const ColorSpace colorSpace)
 // =================
 
 template<ColorSpace C>
-ColorImage<unsigned char, C>::ColorImage() : m_channels(getNumberOfChannels(C))
+ColorImage<unsigned char, C>::ColorImage() : m_channels{getNumberOfChannels(C)}
 {
     setRGBAOffsets();
     std::clog << "ColorImage default constructor" << std::endl;
 }
 
 template<ColorSpace C>
-ColorImage<float, C>::ColorImage() : m_channels(getNumberOfChannels(C))
+ColorImage<float, C>::ColorImage() : m_channels{getNumberOfChannels(C)}
 {
     setRGBAOffsets();
     std::clog << "ColorImage default constructor" << std::endl;
@@ -134,8 +134,8 @@ ColorImage<float, C>::ColorImage() : m_channels(getNumberOfChannels(C))
 
 template<ColorSpace C>
 ColorImage<unsigned char, C>::ColorImage(int width, int height)
-    : Image(width, height),
-	  m_channels(getNumberOfChannels(C))
+    : Image{width, height},
+      m_channels{getNumberOfChannels(C)}
 {
     std::clog << "ColorImage width/height constructor" << std::endl;
     setRGBAOffsets();
@@ -143,9 +143,9 @@ ColorImage<unsigned char, C>::ColorImage(int width, int height)
 }
 
 template<ColorSpace C>
-ColorImage<float, C>::ColorImage(int width, int height) 
-    : Image(width, height),
-	  m_channels(getNumberOfChannels(C))
+ColorImage<float, C>::ColorImage(int width, int height)
+    : Image{width, height}, 
+      m_channels{getNumberOfChannels(C)}
 {
     std::clog << "ColorImage width/height constructor" << std::endl;
     setRGBAOffsets();
@@ -154,8 +154,8 @@ ColorImage<float, C>::ColorImage(int width, int height)
 
 
 template<ColorSpace C>
-ColorImage<unsigned char, C>::ColorImage(const std::string& fileName) 
-    : m_channels(getNumberOfChannels(C))
+ColorImage<unsigned char, C>::ColorImage(const std::string& fileName)
+    : m_channels{getNumberOfChannels(C)}
 {
     std::clog << "ColorImage filename constructor" << std::endl;
     setRGBAOffsets();
@@ -163,8 +163,8 @@ ColorImage<unsigned char, C>::ColorImage(const std::string& fileName)
 }
 
 template<ColorSpace C>
-ColorImage<float, C>::ColorImage(const std::string& fileName) 
-    : m_channels(getNumberOfChannels(C))
+ColorImage<float, C>::ColorImage(const std::string& fileName)
+    : m_channels{getNumberOfChannels(C)}
 {
     std::clog << "ColorImage filename constructor" << std::endl;
     setRGBAOffsets();
@@ -197,20 +197,22 @@ bool ColorImage<unsigned char, C>::read(const std::string& fileName)
     dummy.open(fileName);
 
     bool throwsError = false;
-    if (!dummy.is_open()) 
+    if (!dummy.is_open())
     {
         std::cerr << "ERROR: Could not open or find file " << fileName << "." << std::endl;
-    	throwsError = true;
-    } 
-    else 
+        throwsError = true;
+    }
+    else
     {
         std::clog << "Trying to open file with OpenCV..." << std::endl;
         // read image using openCV
         throwsError = !readCv(fileName);
-		
-		// special conversion if image is in HSV-Space
-		if (!throwsError && C == ColorSpace::CS_HSV)
-			ColorImage::convertToHsv();
+
+        // special conversion if image is in HSV-Space
+        if (!throwsError && C == ColorSpace::CS_HSV)
+        {
+            ColorImage::convertToHsv();
+        }
     }
     return throwsError;
 }
@@ -236,11 +238,13 @@ bool ColorImage<float, C>::read(const std::string& fileName)
         // read image using openCV
         throwsError = !readCv(fileName);
 
-	// special conversion if image is in HSV- or Lab-Space
-	if (!throwsError && C == ColorSpace::CS_HSV)
-	    ColorImage::convertToHsv();
-	else if (!throwsError && C == ColorSpace::CS_LAB)
-	    ColorImage::convertToLab();
+        // special conversion if image is in HSV- or Lab-Space
+        if (!throwsError && C == ColorSpace::CS_HSV)
+        {
+            ColorImage::convertToHsv();
+        }
+        else if (!throwsError && C == ColorSpace::CS_LAB)
+            ColorImage::convertToLab();
     }
     return throwsError;
 }
@@ -249,12 +253,12 @@ bool ColorImage<float, C>::read(const std::string& fileName)
 template<ColorSpace C>
 void ColorImage<unsigned char, C>::write(const std::string& fileName) const
 {
-	if (m_width == 0 && m_height == 0)
-	{
-		std::cerr << "Image cannot be written to " << fileName << ", because it is empty!" << std::endl;
-		return;
-	}
-	
+    if (m_width == 0 && m_height == 0)
+    {
+        std::cerr << "Image cannot be written to " << fileName << ", because it is empty!" << std::endl;
+        return;
+    }
+
     std::vector<unsigned char> data(size() * m_channels);
 
     // Convert to BGRA-space for OpenCV.
@@ -279,11 +283,11 @@ void ColorImage<unsigned char, C>::write(const std::string& fileName) const
 template<ColorSpace C>
 void ColorImage<float, C>::write(const std::string& fileName) const
 {
-	if (m_width == 0 && m_height == 0)
-	{
-		std::cerr << "Image cannot be written to " << fileName << ", because it is empty!" << std::endl;
-		return;
-	}
+    if (m_width == 0 && m_height == 0)
+    {
+        std::cerr << "Image cannot be written to " << fileName << ", because it is empty!" << std::endl;
+        return;
+    }
 
     std::vector<float> data(size() * m_channels);
 
@@ -310,115 +314,124 @@ void ColorImage<float, C>::write(const std::string& fileName) const
 template<ColorSpace C>
 void ColorImage<unsigned char, C>::copyTo(ColorImage* output) const
 {
-	output->m_width = m_width;
-	output->m_height = m_height;
-	output->m_data = m_data;
+    output->m_width = m_width;
+    output->m_height = m_height;
+    output->m_data = m_data;
 }
 
 template<ColorSpace C>
 void ColorImage<float, C>::copyTo(ColorImage* output) const
 {
     output->m_width = m_width;
-	output->m_height = m_height;
-	output->m_data = m_data;
+    output->m_height = m_height;
+    output->m_data = m_data;
 }
 
 
-// TODO: Method is massive, cut size down somehow.
 template<ColorSpace C> template<ColorSpace D>
 void ColorImage<unsigned char, C>::convertColorSpace(ColorImage<unsigned char, D>* output) const
 {
     output->m_width = m_width;
     output->m_height = m_height;
-
-	output->m_data.resize(m_width * m_height * output->m_channels);
+    output->m_data.resize(m_width * m_height * output->m_channels);
 
     if (C == D)
-	{
+    {
         std::copy(m_data.begin(), m_data.end(), output->m_data.begin());
-		return;
-    }	
-	
-	for (unsigned i = 0; i < size(); ++i)
-	{
-		if (m_channels == output->m_channels)	// if both images have same number of channels
-		{
-			output->setPixelColor(i, m_data[R(i)], 
-									 m_data[G(i)], 
-									 m_data[B(i)], 
-									 m_data[A(i)]);
-		}
-		else if (output->m_channels == 1)		// input.m_channels is implicitly greater than output's
-		{
-			float averageColor = 0;
-			// Calculate average color value and assign it.
-			// TODO: Other weights (luminosity etc.) instead of just average color.
-			averageColor = (  m_data[B(i)] 
-							+ m_data[G(i)] 
-							+ m_data[R(i)]) / 3.0f;
-			unsigned char avgColor = static_cast<unsigned char>(averageColor);
-			output->setPixelColor(i, avgColor, avgColor, avgColor);
-		}
-		else									// in all other cases the alpha is either dismissed or set to default value
-		{
-			output->setPixelColor(i, m_data[R(i)], m_data[G(i)], m_data[B(i)]);
-		}	
-	}    
+        return;
+    }
 
-    // If needed, convert from/to HSV based system.
+    for (unsigned i = 0; i < size(); ++i)
+    {
+        // if both images have alpha
+        if (m_channels == 4 && output->m_channels == 4)
+        {
+            // just copy over the color values in the new order
+            output->setPixelColor(i,
+                                  m_data[R(i)],
+                                  m_data[G(i)],
+                                  m_data[B(i)],
+                                  m_data[A(i)]);
+        }
+        // Conversion to grey image.
+        // input.m_channels is implicitly greater than output's
+        else if (output->m_channels == 1)
+        {
+            // Calculate average color value and assign it.
+            float averageColor = 0;
+            // TODO: Other weights (luminosity etc.) instead of just average color.
+            averageColor = (m_data[B(i)] + m_data[G(i)] + m_data[R(i)]) / 3.0f;
+            unsigned char avgColor = static_cast<unsigned char>(averageColor);
+            output->setPixelColor(i, avgColor, avgColor, avgColor);
+        }
+        // else copy color values in new order, but omit alpha or set to default value
+        else
+        {
+            output->setPixelColor(i, m_data[R(i)], m_data[G(i)], m_data[B(i)]);
+        }
+    }
+
+    // If needed, convert from/to HSV-space.
     if (C == ColorSpace::CS_HSV && D != ColorSpace::CS_HSV)
         output->convertFromHsv();
-	else if (C != ColorSpace::CS_HSV && D == ColorSpace::CS_HSV)
+    else if (C != ColorSpace::CS_HSV && D == ColorSpace::CS_HSV)
         output->convertToHsv();
 }
 
 
-// TODO: Method is massive, cut size down somehow.
 template<ColorSpace C> template<ColorSpace D>
 void ColorImage<float, C>::convertColorSpace(
     ColorImage<float, D>* output) const
 {
     output->m_width = m_width;
     output->m_height = m_height;
-
-	output->m_data.resize(m_width * m_height * output->m_channels);
+    output->m_data.resize(m_width * m_height * output->m_channels);
 
     if (C == D)
-	{
+    {
         std::copy(m_data.begin(), m_data.end(), output->m_data.begin());
-		return;
-    }	
-	
-	for (unsigned i = 0; i < size(); ++i)
-	{
-		if (m_channels == output->m_channels)	// if both images have same number of channels
-		{
-			output->setPixelColor(i, m_data[R(i)], 
-									 m_data[G(i)], 
-									 m_data[B(i)], 
-									 m_data[A(i)]);
-		}
-		else if (output->m_channels == 1)		// input.m_channels is implicitly greater than output's
-		{
-			float averageColor = 0;
-			// Calculate average color value and assign it.
-			// TODO: Other weights (luminosity etc.) instead of just average color.
-			averageColor = (  m_data[B(i)] 
-							+ m_data[G(i)] 
-							+ m_data[R(i)]) / 3.0f;
-			output->setPixelColor(i, averageColor, averageColor, averageColor);
-		}
-		else									// in all other cases the alpha is either dismissed or set to default value
-		{
-			output->setPixelColor(i, m_data[R(i)], m_data[G(i)], m_data[B(i)]);
-		}	
-	}  
+        return;
+    }
 
-    // If needed, convert from/to HSV based system or from/to Lab.
+    for (unsigned i = 0; i < size(); ++i)
+    {
+        // if both images have alpha
+        if (m_channels == 4 && output->m_channels == 4)
+        {
+            // just copy over the color values in the new order
+            output->setPixelColor(i, 
+                                  m_data[R(i)],
+                                  m_data[G(i)],
+                                  m_data[B(i)],
+                                  m_data[A(i)]);
+        }
+        // Conversion to grey image.
+        // input.m_channels is implicitly greater than output's
+        else if (output->m_channels == 1)
+        {
+            // Calculate average color value and assign it.
+            float averageColor = 0;
+            // TODO: Other weights (luminosity etc.) instead of just average color.
+            averageColor = (m_data[B(i)] + m_data[G(i)] + m_data[R(i)]) / 3.0f;
+            output->setPixelColor(i, averageColor, averageColor, averageColor);
+        }
+        // else copy color values in new order, but omit alpha or set to default value
+        else
+        {
+            output->setPixelColor(i, m_data[R(i)], m_data[G(i)], m_data[B(i)]);
+        }
+    }
+
+    // If needed, convert from/to HSV-/Lab-space.
+    // UNDONE: Case HSV <-> Lab
     if (C == ColorSpace::CS_HSV && D != ColorSpace::CS_HSV)
         output->convertFromHsv();
     else if (C != ColorSpace::CS_HSV && D == ColorSpace::CS_HSV)
         output->convertToHsv();
+    else if (C == ColorSpace::CS_LAB && D != ColorSpace::CS_LAB)
+        output->convertFromLab();
+    else if (C != ColorSpace::CS_LAB && D == ColorSpace::CS_LAB)
+         output->convertToLab();
 }
 
 
@@ -428,7 +441,7 @@ void ColorImage<unsigned char, C>::convertType(
 {
     output->m_width = m_width;
     output->m_height = m_height;
-	output->m_data.resize(m_width * m_height * m_channels);
+    output->m_data.resize(m_width * m_height * m_channels);
 
     for (int i = 0; i < output->m_data.size(); ++i)
         output->m_data[i] = m_data[i] / 255.0f;
@@ -441,7 +454,7 @@ void ColorImage<float, C>::convertType(
 {
     output->m_width = m_width;
     output->m_height = m_height;
-	output->m_data = m_data;
+    output->m_data = m_data;
 
     for (int i = 0; i < output->m_data.size(); ++i)
         output->m_data[i] = static_cast<unsigned char>(m_data[i] * 255.0f);
@@ -453,7 +466,7 @@ void ColorImage<unsigned char, C>::resize(int width, int height)
 {
     m_width = width;
     m_height = height;
-	m_data.resize(m_width * m_height * m_channels);
+    m_data.resize(m_width * m_height * m_channels);
 }
 
 template<ColorSpace C>
@@ -461,63 +474,63 @@ void ColorImage<float, C>::resize(int width, int height)
 {
     m_width = width;
     m_height = height;
-	m_data.resize(m_width * m_height * m_channels);
+    m_data.resize(m_width * m_height * m_channels);
 }
 
 
 template<ColorSpace C> template<typename U, ColorSpace D>
 bool ColorImage<unsigned char, C>::sameSize(
-	const ColorImage<U, D>& other) const
+    const ColorImage<U, D>& other) const
 {
     if (m_width == other.getWidth() && m_height == other.getHeight())
         return true;
-	
-	return false;
+
+    return false;
 }
 
 template<ColorSpace C> template<typename U, ColorSpace D>
 bool ColorImage<float, C>::sameSize(
     const ColorImage<U, D>& other) const
 {
-	if (m_width == other.getWidth() && m_height == other.getHeight())
-		return true;
-	
-	return false;
+    if (m_width == other.getWidth() && m_height == other.getHeight())
+        return true;
+
+    return false;
 }
 
 
 template<ColorSpace C>
 void ColorImage<unsigned char, C>::setPixelColor(int pixelIdx,
-										 unsigned char r,
-										 unsigned char g /* = r */,
-										 unsigned char b /* = r */,
-										 unsigned char a /* = 255 */)
+                                                 unsigned char r,
+                                                 unsigned char g,
+                                                 unsigned char b,
+                                                 unsigned char a /* = 255 */)
 {
-	m_data[B(pixelIdx)] = b;
-	if (m_channels >= 3) 
-	{
-		m_data[G(pixelIdx)] = g;
-		m_data[R(pixelIdx)] = r;
-	}
-	if (m_channels == 4)
-		m_data[A(pixelIdx)] = a;
+    m_data[B(pixelIdx)] = b;
+    if (m_channels >= 3)
+    {
+        m_data[G(pixelIdx)] = g;
+        m_data[R(pixelIdx)] = r;
+    }
+    if (m_channels == 4)
+        m_data[A(pixelIdx)] = a;
 }
 
 template<ColorSpace C>
 void ColorImage<float, C>::setPixelColor(int pixelIdx,
-										 float r,
-										 float g /* = r */,
-										 float b /* = r */,
-										 float a /* = 1.0f */)
+                                         float r,
+                                         float g,
+                                         float b,
+                                         float a /* = 1.0f */)
 {
-	m_data[B(pixelIdx)] = b;
-	if (m_channels >= 3) 
-	{
-		m_data[G(pixelIdx)] = g;
-		m_data[R(pixelIdx)] = r;
-	}
-	if (m_channels == 4)
-		m_data[A(pixelIdx)] = a;
+    m_data[B(pixelIdx)] = b;
+    if (m_channels >= 3)
+    {
+        m_data[G(pixelIdx)] = g;
+        m_data[R(pixelIdx)] = r;
+    }
+    if (m_channels == 4)
+        m_data[A(pixelIdx)] = a;
 }
 
 
@@ -555,7 +568,7 @@ void ColorImage<unsigned char, C>::setToValue(unsigned char r,
                                               unsigned char b,
                                               unsigned char a /* = 255 */)
 {
-    for (unsigned i = 0; i < size(); ++i) 
+    for (unsigned i = 0; i < size(); ++i)
         setPixelColor(i, r, g, b, a);
 }
 
@@ -564,9 +577,9 @@ template<ColorSpace C>
 void ColorImage<float, C>::setToValue(float r,
                                       float g,
                                       float b,
-                                      float a /* = 1.0f */) 
+                                      float a /* = 1.0f */)
 {
-    for (unsigned i = 0; i < size(); i += m_channels) 
+    for (unsigned i = 0; i < size(); i += m_channels)
         setPixelColor(i, r, g, b, a);
 }
 
@@ -658,7 +671,10 @@ int ColorImage<float, C>::B(int x, int y) const
 template<ColorSpace C>
 int ColorImage<unsigned char, C>::A(int pixelIdx) const
 {
-    return pixelIdx * m_channels + m_offsetA;
+    if (m_offsetA == -1)
+        return -1;
+    else
+        return pixelIdx * m_channels + m_offsetA;
 }
 
 
@@ -672,7 +688,10 @@ int ColorImage<unsigned char, C>::A(int x, int y) const
 template<ColorSpace C>
 int ColorImage<float, C>::A(int pixelIdx) const
 {
-    return pixelIdx * m_channels + m_offsetA;
+    if (m_offsetA == -1)
+        return -1;
+    else
+        return pixelIdx * m_channels + m_offsetA;
 }
 
 
@@ -844,7 +863,7 @@ template<ColorSpace C>
 void ColorImage<unsigned char, C>::convertToHsv()
 {
     float h, s, v;
-	unsigned size = this->size();
+    unsigned size = this->size();
     for (unsigned i = 0; i < size; ++i)
     {
         convertColorToHsv(m_data[R(i)] / 255.0f, // Since conversion-function
@@ -867,13 +886,13 @@ template<ColorSpace C>
 void ColorImage<float, C>::convertToHsv()
 {
     float h, s, v;
-	unsigned size = this->size();
+    unsigned size = this->size();
     for (unsigned i = 0; i < size; ++i)
     {
-        convertColorToHsv(m_data[R(i)], 
-						  m_data[G(i)],
-						  m_data[B(i)],
-						  &h, &s, &v);
+        convertColorToHsv(m_data[R(i)],
+                          m_data[G(i)],
+                          m_data[B(i)],
+                          &h, &s, &v);
 
         m_data[R(i)] = h / 360.0f;  // Normalizing the hue value.
         m_data[G(i)] = s;
@@ -888,13 +907,13 @@ void ColorImage<unsigned char, C>::convertFromHsv()
     float r, g, b;
     for (unsigned i = 0; i < m_width * m_height; ++i)
     {
-        convertColorFromHsv(m_data[H(i)] * 2.0f, // Conversion function ex-
-                            m_data[S(i)] / 255.0f, // pects hue in range from
-                            m_data[V(i)] / 255.0f, // [0,360] and s,v from 
-                            &r, &g, &b); // [0,1].
+        // Conversion function expects hue in range [0,360] and s,v [0,1].
+        convertColorFromHsv(m_data[H(i)] * 2.0f,
+                            m_data[S(i)] / 255.0f,
+                            m_data[V(i)] / 255.0f,
+                            &r, &g, &b);
 
-        // Since the data is in unsigned char, we must map the floats
-        // accordingly.
+        // Since the data is in unsigned char, we must map the floats accordingly.
         m_data[R(i)] = static_cast<unsigned char> (r * 255);
         m_data[G(i)] = static_cast<unsigned char> (g * 255);
         m_data[B(i)] = static_cast<unsigned char> (b * 255);
@@ -905,7 +924,7 @@ void ColorImage<unsigned char, C>::convertFromHsv()
 template<ColorSpace C>
 void ColorImage<float, C>::convertFromHsv()
 {
-    float r, g, b;
+    float r = 0, g = 0, b = 0;
     for (unsigned i = 0; i < size(); ++i)
     {
         convertColorFromHsv(m_data[H(i)] * 360.0f,
@@ -913,8 +932,6 @@ void ColorImage<float, C>::convertFromHsv()
                             m_data[V(i)],
                             &r, &g, &b);
 
-        // Since the data is in unsigned char, we must map the floats
-        // accordingly.
         m_data[R(i)] = r;
         m_data[G(i)] = g;
         m_data[B(i)] = b;
@@ -923,11 +940,13 @@ void ColorImage<float, C>::convertFromHsv()
 
 
 template<ColorSpace C>
-void ColorImage<unsigned char, C>::convertColorToHsv(float r, float g,
-                                                     float b, float* h,
-                                                     float* s, float* v)
+void ColorImage<unsigned char, C>::convertColorToHsv(float  r,
+                                                     float  g,
+                                                     float  b,
+                                                     float* h,
+                                                     float* s,
+                                                     float* v)
 {
-
     // This code is based on Daniel Mohr's version, which again is based on the
     // approach presented in Computer Graphics: Principles and Practive. Foley
     // et al.
@@ -946,13 +965,13 @@ void ColorImage<unsigned char, C>::convertColorToHsv(float r, float g,
         *s = 0.0f;
 
     // Calculate hue value
-    if (*s == 0.0f)	
-	{
+    if (*s == 0.0f)
+    {
         // Hue is undefined here, so we just assign 0.
         *h = 0.0f;
-	} 
-	else 
-	{
+    }
+    else
+    {
         float delta = max - min;
         if (r == max)
             *h = (g - b) / delta;
@@ -994,8 +1013,8 @@ void ColorImage<float, C>::convertColorToHsv(float  r, float  g, float  b,
     {
         // Hue is undefined here, so we just assign 0.
         *h = 0.0f;
-    } 
-	else
+    }
+    else
     {
         float delta = max - min;
         if (r == max)
@@ -1014,80 +1033,71 @@ void ColorImage<float, C>::convertColorToHsv(float  r, float  g, float  b,
 
 template<ColorSpace C>
 void ColorImage<unsigned char, C>::convertColorFromHsv(float h,
-													   float s,
+                                                       float s,
                                                        float v,
-													   float* r,
+                                                       float* r,
                                                        float* g,
-													   float* b)
+                                                       float* b)
 {
     /* This code is based on Daniel Mohr's version, which again is based on
-    the approach presented in Computer Graphics: Principles and
-    Practive. Foley et al. */
+     * the approach presented in Computer Graphics: Principles and
+     * Practive. Foley et al. */
     /* Given: h in [0, 360) or UNDEFINED, s and v in [0, 1] */
     /* Desired: r, g, b, each in [0, 1]. */
     if (s == 0)
     {
-        if (h == -1.0)
-        {
-            *r = v;
-            *g = v;
-            *b = v;
-        } 
-		else
-        {
-            std::cerr << "HSV -> RGB conversion error (s == 0 and h > 0)\n" 
-					  << std::endl;
-            exit(1);
-        }
-    } 
-	else
+        // achromatic (grey)
+        *r = *g = *b = v;
+        return;
+    }
+
+    float f, p, q, t;
+    int i;
+
+    if (h == 360.0)
     {
-        float f, p, q, t;
-        int i;
+        h = 0.0;
+    }
 
-        if (h == 360.0)
-            h = 0.0;
+    h /= 60;
+    i = static_cast<int>(std::floor(h));
+    f = h - i;
+    p = v * (1.0f - s);
+    q = v * (1.0f - (s * f));
+    t = v * (1.0f - (s * (1.0f - f)));
 
-        h /= 60;
-        i = static_cast<int> (std::floor(h));
-        f = h - i;
-        p = v * (1.0f - s);
-        q = v * (1.0f - (s * f));
-        t = v * (1.0f - (s * (1.0f - f)));
-
-        switch (i)
-        {
-            case 0:
-                *r = v;
-                *g = t;
-                *b = p;
-                break;
-            case 1:
-                *r = q;
-                *g = v;
-                *b = p;
-                break;
-            case 2:
-                *r = p;
-                *g = v;
-                *b = t;
-                break;
-            case 3:
-                *r = p;
-                *g = q;
-                *b = v;
-                break;
-            case 4:
-                *r = t;
-                *g = p;
-                *b = v;
-                break;
-            case 5:
-                *r = v;
-                *g = p;
-                *b = q;
-                break;
-        }
+    switch (i)
+    {
+    case 0:
+        *r = v;
+        *g = t;
+        *b = p;
+        break;
+    case 1:
+        *r = q;
+        *g = v;
+        *b = p;
+        break;
+    case 2:
+        *r = p;
+        *g = v;
+        *b = t;
+        break;
+    case 3:
+        *r = p;
+        *g = q;
+        *b = v;
+        break;
+    case 4:
+        *r = t;
+        *g = p;
+        *b = v;
+        break;
+    default:       // case 5 :
+        *r = v;
+        *g = p;
+        *b = q;
+        break;
     }
 }
 
@@ -1103,69 +1113,58 @@ void ColorImage<float, C>::convertColorFromHsv(float  h, float  s, float  v,
     // Desired: r, g, b, each in [0, 1].
     if (s == 0)
     {
-        if (h == -1.0)
-        {
-            *r = v;
-            *g = v;
-            *b = v;
-        } 
-		else
-        {
-            std::cout << "HSV -> RGB conversion error (s == 0 and h> 0)\n" <<
-                std::endl;
-            exit(1);
-        }
-    } 
-	else
+        // achromatic (grey)
+        *r = *g = *b = v;
+        return;
+    }
+
+    float f, p, q, t;
+    int i;
+
+    if (h == 360.0)
     {
-        float f, p, q, t;
-        int i;
+        h = 0.0;
+    }
 
-        if (h == 360.0)
-        {
-            h = 0.0;
-        }
+    h /= 60;
+    i = static_cast<int>(std::floor(h));
+    f = h - i;
+    p = v * (1.0f - s);
+    q = v * (1.0f - (s * f));
+    t = v * (1.0f - (s * (1.0f - f)));
 
-        h /= 60;
-        i = static_cast<int> (std::floor(h));
-        f = h - i;
-        p = v * (1.0f - s);
-        q = v * (1.0f - (s * f));
-        t = v * (1.0f - (s * (1.0f - f)));
-
-        switch (i)
-        {
-            case 0:
-                *r = v;
-                *g = t;
-                *b = p;
-                break;
-            case 1:
-                *r = q;
-                *g = v;
-                *b = p;
-                break;
-            case 2:
-                *r = p;
-                *g = v;
-                *b = t;
-                break;
-            case 3:
-                *r = p;
-                *g = q;
-                *b = v;
-                break;
-            case 4:
-                *r = t;
-                *g = p;
-                *b = v;
-                break;
-            case 5:
-                *r = v;
-                *g = p;
-                *b = q;
-                break;
-        }
+    switch (i)
+    {
+    case 0:
+        *r = v;
+        *g = t;
+        *b = p;
+        break;
+    case 1:
+        *r = q;
+        *g = v;
+        *b = p;
+        break;
+    case 2:
+        *r = p;
+        *g = v;
+        *b = t;
+        break;
+    case 3:
+        *r = p;
+        *g = q;
+        *b = v;
+        break;
+    case 4:
+        *r = t;
+        *g = p;
+        *b = v;
+        break;
+    default:       // case 5 :
+        *r = v;
+        *g = p;
+        *b = q;
+        break;
     }
 }
 
@@ -1175,18 +1174,18 @@ template<ColorSpace C>
 void ColorImage<float, C>::convertToLab()
 {
     float lab[3];
-    float min[3] ={std::numeric_limits<float>::max()};
-    float max[3] ={-std::numeric_limits<float>::max()};
+    float min[3] = { std::numeric_limits<float>::max() };
+    float max[3] = { -std::numeric_limits<float>::max() };
 
     int numPixels = m_width * m_height;
     for (int i = 0; i < numPixels; ++i)
     {
         convertColorToLab(m_data[R(i)],
-						  m_data[G(i)],
-						  m_data[B(i)],
+                          m_data[G(i)],
+                          m_data[B(i)],
                           &lab[0],
-						  &lab[1],
-						  &lab[2]);
+                          &lab[1],
+                          &lab[2]);
 
         m_data[R(i)] = lab[0];
         m_data[G(i)] = lab[1];
@@ -1200,11 +1199,11 @@ template<ColorSpace C>
 void ColorImage<float, C>::convertFromLab()
 {
     float r, g, b;
-    for (int i = 0; i < m_width * m_height; ++i)
+    for (unsigned i = 0; i < size(); ++i)
     {
         convertColorFromLab(m_data[R(i)],
-							m_data[G(i)],
-							m_data[B(i)],
+                            m_data[G(i)],
+                            m_data[B(i)],
                             &r, &g, &b);
 
         // Since the data is in unsigned char, we must map the floats
@@ -1269,21 +1268,21 @@ void ColorImage<float, C>::convertColorFromLab(float lIn, float aIn, float bIn,
     bool zr = z > (6.0f / 29.0f);
 
     // Use inverse from function f from forward conversion.
-    float fInverseX = xr ? 
-		std::pow(x, 3.0f) : ((108.0f / 841.0f) * (x - (4.0f / 29.0f)));
+    float fInverseX = xr ?
+        std::pow(x, 3.0f) : ((108.0f / 841.0f) * (x - (4.0f / 29.0f)));
     float fInverseY = yr ?
-		std::pow(y, 3.0f) : ((108.0f / 841.0f) * (y - (4.0f / 29.0f)));
-    float fInverseZ = zr ? 
-		std::pow(z, 3.0f) : ((108.0f / 841.0f) * (y - (4.0f / 29.0f)));
+        std::pow(y, 3.0f) : ((108.0f / 841.0f) * (y - (4.0f / 29.0f)));
+    float fInverseZ = zr ?
+        std::pow(z, 3.0f) : ((108.0f / 841.0f) * (y - (4.0f / 29.0f)));
 
     x = X_WHITE * fInverseX;
     y = Y_WHITE * fInverseY;
     z = Z_WHITE * fInverseZ;
 
     // Converts x, y, z into r, g, b.
-    *r = (3.240479f * x) + (-1.53715f  * y) + (-0.498535f * z);
-    *g = (-0.969256f * x) + (1.875991f * y) + (0.041556f * z);
-    *b = (0.055648f * x) + (-0.204043f * y) + (1.057311f * z);
+    *r = ( 3.240479f * x) + (-1.53715f  * y) + (-0.498535f * z);
+    *g = (-0.969256f * x) + ( 1.875991f * y) + ( 0.041556f * z);
+    *b = ( 0.055648f * x) + (-0.204043f * y) + ( 1.057311f * z);
 }
 
 
@@ -1300,26 +1299,26 @@ bool ColorImage<unsigned char, C>::readCv(const std::string& fileName)
     if (cvImage.channels() != m_channels)
     {
         std::cerr << "ERROR: Image does not have compatible number of channels!\n"
-		  << "(Expected " << m_channels << " channels, but file has "
-		  << cvImage.channels() << " channels.)" 
-                  << std::endl;
+            << "(Expected " << m_channels << " channels, but file has "
+            << cvImage.channels() << " channels.)"
+            << std::endl;
         return false;
     }
 
-    m_width  = cvImage.size().width;
+    m_width = cvImage.size().width;
     m_height = cvImage.size().height;
     m_data.resize(m_width * m_height * m_channels);
 
     unsigned char* data = cvImage.data;
 
-    for (unsigned i = 0; i < size(); ++i) 
-	{
+    for (unsigned i = 0; i < size(); ++i)
+    {
         // BUG: Not actually a bug, but unnecessary: we pass some values
-		// as parameters, even though they might not be used (e.g. alpha value
-		// in 3-channel-image.
-		setPixelColor(i, data[2], data[1], data[0], data[3]);	// in this order because cvIMage is BGR(A) space
-		data += m_channels;
-	}
+        // as parameters, even though they might not be used (e.g. alpha value
+        // in 3-channel-image.
+        setPixelColor(i, data[2], data[1], data[0], data[3]);	// in this order because cvIMage is BGR(A) space
+        data += m_channels;
+    }
 
     return true;
 }
@@ -1338,13 +1337,13 @@ bool ColorImage<float, C>::readCv(const std::string& fileName)
     if (cvImage.channels() != m_channels)
     {
         std::cerr << "ERROR: Image does not have compatible number of channels!\n"
-		  << "(Expected " << m_channels << " channels, but file has "
-		  << cvImage.channels() << " channels.)" 
-                  << std::endl;
+            << "(Expected " << m_channels << " channels, but file has "
+            << cvImage.channels() << " channels.)"
+            << std::endl;
         return false;
     }
 
-    m_width  = cvImage.size().width;
+    m_width = cvImage.size().width;
     m_height = cvImage.size().height;
     m_data.resize(m_width * m_height * m_channels);
 
@@ -1353,17 +1352,17 @@ bool ColorImage<float, C>::readCv(const std::string& fileName)
     //// step alignment into next scan line
     // int step = static_cast<int>(cvImage.step);
 
-    for (unsigned i = 0; i < size(); ++i) 
-	{
+    for (unsigned i = 0; i < size(); ++i)
+    {
         // BUG: Not actually a bug, but unnecessary: we pass some values
-		// as parameters, even though they might not be used (e.g. alpha value
-		// in 3-channel-image.
-		setPixelColor(i, data[2] / 255.0f, 
-			             data[1] / 255.0f, 
-						 data[0] / 255.0f, 
-						 data[3] / 255.0f);	// in this order because cvIMage is BGR(A) space
-		data += m_channels;
-	}
+        // as parameters, even though they might not be used (e.g. alpha value
+        // in 3-channel-image.
+        setPixelColor(i, data[2] / 255.0f,
+                      data[1] / 255.0f,
+                      data[0] / 255.0f,
+                      data[3] / 255.0f);	// in this order because cvIMage is BGR(A) space
+        data += m_channels;
+    }
 
     return true;
 }
@@ -1374,42 +1373,44 @@ void ColorImage<unsigned char, C>::setRGBAOffsets()
 {
     switch (C)
     {
-        case ColorSpace::CS_RGB:
-        case ColorSpace::CS_HSV:
-        case ColorSpace::CS_LAB:
-            m_offsetR = 0;
-            m_offsetG = 1;
-            m_offsetB = 2;
-            break;
-        case ColorSpace::CS_GRAY:
-            m_offsetR = m_offsetG = m_offsetB = m_offsetA = 0;
-            break;
-        case ColorSpace::CS_BGR:
-            m_offsetR = 2;
-            m_offsetG = 1;
-            m_offsetB = 0;
-            break;
-        case ColorSpace::CS_RGBA:
-            m_offsetR = 0;
-            m_offsetG = 1;
-            m_offsetB = 2;
-            m_offsetA = 3;
-            break;
-        case ColorSpace::CS_BGRA:
-            m_offsetR = 2;
-            m_offsetG = 1;
-            m_offsetB = 0;
-            m_offsetA = 3;
-            break;
-        case ColorSpace::CS_ARGB:
-            m_offsetR = 1;
-            m_offsetG = 2;
-            m_offsetB = 3;
-            m_offsetA = 0;
-            break;
-        default:
-            m_offsetR = m_offsetG = m_offsetB = m_offsetA = 0;
-            break;
+    case ColorSpace::CS_RGB:
+    case ColorSpace::CS_HSV:
+    case ColorSpace::CS_LAB:
+        m_offsetR = 0;
+        m_offsetG = 1;
+        m_offsetB = 2;
+        m_offsetA = -1;
+        break;
+    case ColorSpace::CS_GRAY:
+        m_offsetR = m_offsetG = m_offsetB = m_offsetA = 0;
+        break;
+    case ColorSpace::CS_BGR:
+        m_offsetR = 2;
+        m_offsetG = 1;
+        m_offsetB = 0;
+        m_offsetA = -1;
+        break;
+    case ColorSpace::CS_RGBA:
+        m_offsetR = 0;
+        m_offsetG = 1;
+        m_offsetB = 2;
+        m_offsetA = 3;
+        break;
+    case ColorSpace::CS_BGRA:
+        m_offsetR = 2;
+        m_offsetG = 1;
+        m_offsetB = 0;
+        m_offsetA = 3;
+        break;
+    case ColorSpace::CS_ARGB:
+        m_offsetR = 1;
+        m_offsetG = 2;
+        m_offsetB = 3;
+        m_offsetA = 0;
+        break;
+    default:
+        m_offsetR = m_offsetG = m_offsetB = m_offsetA = 0;
+        break;
     }
 }
 
@@ -1419,110 +1420,43 @@ void ColorImage<float, C>::setRGBAOffsets()
 {
     switch (C)
     {
-        case ColorSpace::CS_RGB:
-        case ColorSpace::CS_HSV:
-        case ColorSpace::CS_LAB:
-            m_offsetR = 0;
-            m_offsetG = 1;
-            m_offsetB = 2;
-            break;
-        case ColorSpace::CS_GRAY:
-            m_offsetR = m_offsetG = m_offsetB = m_offsetA = 0;
-            break;
-        case ColorSpace::CS_BGR:
-            m_offsetR = 2;
-            m_offsetG = 1;
-            m_offsetB = 0;
-            break;
-        case ColorSpace::CS_RGBA:
-            m_offsetR = 0;
-            m_offsetG = 1;
-            m_offsetB = 2;
-            m_offsetA = 3;
-            break;
-        case ColorSpace::CS_BGRA:
-            m_offsetR = 2;
-            m_offsetG = 1;
-            m_offsetB = 0;
-            m_offsetA = 3;
-            break;
-        case ColorSpace::CS_ARGB:
-            m_offsetR = 1;
-            m_offsetG = 2;
-            m_offsetB = 3;
-            m_offsetA = 0;
-            break;
-        default:
-            m_offsetR = m_offsetG = m_offsetB = m_offsetA = 0;
-            break;
+    case ColorSpace::CS_RGB:
+    case ColorSpace::CS_HSV:
+    case ColorSpace::CS_LAB:
+        m_offsetR = 0;
+        m_offsetG = 1;
+        m_offsetB = 2;
+        m_offsetA = -1;
+        break;
+    case ColorSpace::CS_GRAY:
+        m_offsetR = m_offsetG = m_offsetB = m_offsetA = 0;
+        break;
+    case ColorSpace::CS_BGR:
+        m_offsetR = 2;
+        m_offsetG = 1;
+        m_offsetB = 0;
+        m_offsetA = -1;
+        break;
+    case ColorSpace::CS_RGBA:
+        m_offsetR = 0;
+        m_offsetG = 1;
+        m_offsetB = 2;
+        m_offsetA = 3;
+        break;
+    case ColorSpace::CS_BGRA:
+        m_offsetR = 2;
+        m_offsetG = 1;
+        m_offsetB = 0;
+        m_offsetA = 3;
+        break;
+    case ColorSpace::CS_ARGB:
+        m_offsetR = 1;
+        m_offsetG = 2;
+        m_offsetB = 3;
+        m_offsetA = 0;
+        break;
+    default:
+        m_offsetR = m_offsetG = m_offsetB = m_offsetA = 0;
+        break;
     }
 }
-
-/**
- *	FLOAT
- **/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// -------
-// PRIVATE
-// -------
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -8,9 +8,11 @@ Image<T>::Image() : m_width(0), m_height(0)
 
 
 template<typename T>
-Image<T>::Image(unsigned int width, unsigned int height) : m_width(width), m_height(height)
+Image<T>::Image(unsigned int width, unsigned int height) 
+: m_width(width), m_height(height)
 {
     m_data.resize(width * height);
+    std::clog << "Image width/height constructor." << std::endl;
 }
 
 
@@ -23,6 +25,13 @@ template<typename T>
 unsigned int Image<T>::size() const
 {
     return m_width * m_height;
+}
+
+
+template<typename T>
+std::vector<T>& Image<T>::getData()
+{
+    return m_data;
 }
 
 

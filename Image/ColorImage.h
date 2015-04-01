@@ -6,7 +6,7 @@
 
 #include<iostream>	// std::cout, std::clog, std::cerr, std::endl
 #include<string>
-#include<fstream>	// dummy file reading
+#include<fstream>	// file reading
 #include<algorithm>	// std::max(), std::min(), std::copy()
 
 #include<opencv2\core\core.hpp>
@@ -32,7 +32,7 @@ template<ColorSpace C>
 class ColorImage<unsigned char, C> : public Image < unsigned char >
 {
 public:
-    // TODO: Friending all specializations to gain access to their 
+    // FIX: Friending all specializations to gain access to their 
     // internals. No idea how to circumvent this yet.
     friend class ColorImage < unsigned char, ColorSpace::CS_GRAY >;
     friend class ColorImage < unsigned char, ColorSpace::CS_RGB >;
@@ -73,11 +73,11 @@ public:
         bool sameSize(const ColorImage<U, D>& other) const;
     // Warning: Current image becomes invalid!
     void resize(int width, int height);
-	void setPixelColor(int pixelIdx, 
-					   unsigned char r,
-					   unsigned char g,
-					   unsigned char b,
-					   unsigned char a = 255);
+        void setPixelColor(int pixelIdx, 
+                                           unsigned char r,
+                                           unsigned char g,
+                                           unsigned char b,
+                                           unsigned char a = 255);
     void setToBlack();
     void setToValue(unsigned char value);
     void setToValue(unsigned char r,
@@ -172,14 +172,14 @@ public:
 
     template<typename U, ColorSpace D> 
         bool sameSize(const ColorImage<U, D>& other) const;
-	// Warning: Current image becomes invalid!
+        // Warning: Current image becomes invalid!
     // UNDONE(Ralf): Resize while retaining old image.
     void resize(int width, int height);
-	void setPixelColor(int pixelIdx, 
-					   float r,
-					   float g,
-					   float b,
-					   float a = 1.0f);
+        void setPixelColor(int pixelIdx, 
+                                           float r,
+                                           float g,
+                                           float b,
+                                           float a = 1.0f);
     void setToBlack();
     void setToValue(float f);
     void setToValue(float r, float g, float b, float a = 1.0f);

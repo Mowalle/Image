@@ -21,6 +21,7 @@ public :
     unsigned int size() const;
 
     // Getter
+    std::vector<T>& getData();  // For manipulating the data afterwards.
     const std::vector<T>& getData() const;
     unsigned int getWidth()  const;
     unsigned int getHeight() const;
