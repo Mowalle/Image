@@ -118,14 +118,14 @@ int ColorImage<float, C>::getCvType(const ColorSpace colorSpace)
 // =================
 
 template<ColorSpace C>
-ColorImage<unsigned char, C>::ColorImage() : m_channels{getNumberOfChannels(C)}
+ColorImage<unsigned char, C>::ColorImage() : m_channels(getNumberOfChannels(C))
 {
     setRGBAOffsets();
     std::clog << "ColorImage default constructor" << std::endl;
 }
 
 template<ColorSpace C>
-ColorImage<float, C>::ColorImage() : m_channels{getNumberOfChannels(C)}
+ColorImage<float, C>::ColorImage() : m_channels(getNumberOfChannels(C))
 {
     setRGBAOffsets();
     std::clog << "ColorImage default constructor" << std::endl;
@@ -134,8 +134,8 @@ ColorImage<float, C>::ColorImage() : m_channels{getNumberOfChannels(C)}
 
 template<ColorSpace C>
 ColorImage<unsigned char, C>::ColorImage(int width, int height)
-    : Image{width, height},
-      m_channels{getNumberOfChannels(C)}
+    : Image(width, height),
+      m_channels(getNumberOfChannels(C))
 {
     std::clog << "ColorImage width/height constructor" << std::endl;
     setRGBAOffsets();
@@ -144,8 +144,8 @@ ColorImage<unsigned char, C>::ColorImage(int width, int height)
 
 template<ColorSpace C>
 ColorImage<float, C>::ColorImage(int width, int height)
-    : Image{width, height}, 
-      m_channels{getNumberOfChannels(C)}
+    : Image(width, height), 
+      m_channels(getNumberOfChannels(C))
 {
     std::clog << "ColorImage width/height constructor" << std::endl;
     setRGBAOffsets();
@@ -155,7 +155,7 @@ ColorImage<float, C>::ColorImage(int width, int height)
 
 template<ColorSpace C>
 ColorImage<unsigned char, C>::ColorImage(const std::string& fileName)
-    : m_channels{getNumberOfChannels(C)}
+    : m_channels(getNumberOfChannels(C))
 {
     std::clog << "ColorImage filename constructor" << std::endl;
     setRGBAOffsets();
@@ -164,7 +164,7 @@ ColorImage<unsigned char, C>::ColorImage(const std::string& fileName)
 
 template<ColorSpace C>
 ColorImage<float, C>::ColorImage(const std::string& fileName)
-    : m_channels{getNumberOfChannels(C)}
+    : m_channels(getNumberOfChannels(C))
 {
     std::clog << "ColorImage filename constructor" << std::endl;
     setRGBAOffsets();

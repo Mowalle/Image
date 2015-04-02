@@ -1,5 +1,3 @@
-#define _CRT_SECURE_NO_WARNINGS		//TODO To be able to use the fopen() function
-
 #pragma once
 
 #include "Image.h"
@@ -18,7 +16,7 @@
 **/
 enum class ColorSpace
 {
-    CS_GRAY = 0, CS_RGB, CS_BGR, CS_HSV, CS_LAB, CS_RGBA, CS_BGRA, CS_ARGB
+    CS_GRAY, CS_RGB, CS_BGR, CS_HSV, CS_LAB, CS_RGBA, CS_BGRA, CS_ARGB
 };
 
 
