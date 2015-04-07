@@ -21,10 +21,10 @@
     <ClInclude Include="ColorImage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DepthImage.h">
+    <ClInclude Include="IntegralImage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="IntegralImage.h">
+    <ClInclude Include="DepthMap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -38,14 +38,11 @@
     <ClCompile Include="Image.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="DepthImage.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="IntegralImage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="ClassDiagram.cd" />
+    <ClCompile Include="DepthMap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

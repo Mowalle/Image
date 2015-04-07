@@ -3,12 +3,13 @@
 #include "Image.h"
 #include "ColorImage.h"
 
-class DepthImage : public Image<float>
+
+class DepthMap : public Image<float>
 {
 public:
-    DepthImage();
-    DepthImage(unsigned int width, unsigned int height);
-    ~DepthImage();
+    DepthMap();
+    DepthMap(unsigned int width, unsigned int height);
+    ~DepthMap();
 
     bool read(const std::string& fileName);
     void write(const std::string& fileName) const;
@@ -23,5 +24,4 @@ private:
 };
 
 
-ColorImage<float, ColorSpace::CS_GRAY> convertDepthToGray(const DepthImage& depthImg);
-DepthImage convertGrayToDepth(const ColorImage<float, ColorSpace::CS_GRAY>& grayImg);
+ColorImage<float, ColorSpace::CS_GRAY> convertDepthToGray(const DepthMap& depthMap);
