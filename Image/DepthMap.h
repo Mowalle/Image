@@ -16,11 +16,15 @@ public:
 
     float getDepthMin() const;
     float getDepthMax() const;
-    void  setDepthMin(float min);
-    void  setDepthMax(float max);
+    float getMeterToPixelScale() const;
+
+    void setDepthMin(float min);
+    void setDepthMax(float max);
+    void setMeterToPixelScale(float scale);
 
 private:
     float m_minDepth, m_maxDepth; // The minimum and maximum values for distance (in meters).
+    float m_meterToPixelScale;
 };
 
 

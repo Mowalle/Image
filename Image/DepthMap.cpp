@@ -1,17 +1,14 @@
 #include "DepthMap.h"
 
-#include <iostream>
-#include <fstream>
-
-
-DepthMap::DepthMap() : m_minDepth(0), m_maxDepth(1.0f)
+DepthMap::DepthMap() : m_minDepth(0), m_maxDepth(1.0f), m_meterToPixelScale(0)
 {}
 
 
 DepthMap::DepthMap(unsigned int width, unsigned int height) 
     : Image(width, height),
       m_minDepth(0),
-      m_maxDepth(1.0f)
+      m_maxDepth(1.0f),
+      m_meterToPixelScale(0)
 {}
 
 
@@ -21,8 +18,7 @@ DepthMap::~DepthMap()
 
 bool DepthMap::read(const std::string& fileName)
 {
-    std::ifstream infile;
-    infile.open(fileName, std::ios::binary); 
+    std::ifstream infile(fileName, std::ios::binary); 
 
      // if open failed
     if (!infile)
@@ -32,16 +28,17 @@ bool DepthMap::read(const std::string& fileName)
         return false;
     }
 
-    // Check for legacy format.
-    infile.ignore(sizeof(int)); // used to be number of channels
-    infile.read((char*) &m_width, sizeof(m_width));
-    infile.read((char*) &m_height, sizeof(m_height));
-    infile.ignore(sizeof(int)); // used to be scale
-    infile.ignore(sizeof(int)); // used to be meter2Pixel
+   
+    infile.ignore( sizeof(int) ); // used to be number of channels
 
+    infile.read( reinterpret_cast<char*>(&m_width), sizeof(m_width) );
+    infile.read( reinterpret_cast<char*>(&m_height), sizeof(m_height) );
     m_data.resize(m_width * m_height);
-    infile.read((char*) m_data.data(), sizeof(float) * size());
 
+    infile.ignore( sizeof(int) ); // used to be scale
+
+    infile.read( reinterpret_cast<char*>(&m_meterToPixelScale), sizeof(m_meterToPixelScale) );
+    infile.read( reinterpret_cast<char*>(m_data.data()), sizeof(float) * size() );
 
     infile.close();
 
@@ -52,7 +49,7 @@ bool DepthMap::read(const std::string& fileName)
 
 void DepthMap::write(const std::string& fileName) const
 {
-    // TODO: Consider implemeting a header info, something like in the .png format.
+    // TODO: Consider implementing a header info, something like in the .png format.
 
     std::ofstream outfile;
 
@@ -64,12 +61,23 @@ void DepthMap::write(const std::string& fileName) const
         return;
     }
 
-    outfile.write((char*) &m_width, sizeof(m_width));
-    outfile.write((char*) &m_height, sizeof(m_height));
-    for (float value : m_data)
-    {
-        outfile.write((char*) &value, sizeof(float));
-    }
+    int placeholder = 1; // Used where before number of color channels and
+                         // scale were written to file. Obsolete now.
+
+    // Use of const_cast needed here, since we are in a const function.
+    // Using reinterpret_cast insted of plain C-Cast.
+    outfile.write(reinterpret_cast<char*>(&placeholder),
+                  sizeof(int));
+    outfile.write(reinterpret_cast<char*>(const_cast<unsigned*>(&m_width)),
+                  sizeof(m_width));
+    outfile.write(reinterpret_cast<char*>(const_cast<unsigned*>(&m_height)),
+                  sizeof(m_height));
+    outfile.write(reinterpret_cast<char*>(&placeholder),
+                  sizeof(int)); // TODO: Implement scale
+    outfile.write(reinterpret_cast<char*>(const_cast<float*>(&m_meterToPixelScale)),
+                  sizeof(m_meterToPixelScale));
+    outfile.write(reinterpret_cast<char*>(const_cast<float*>(m_data.data())),
+                  sizeof(float) * size());
 
     outfile.close();
 }
@@ -87,6 +95,12 @@ float DepthMap::getDepthMax() const
 }
 
 
+float DepthMap::getMeterToPixelScale() const
+{
+    return m_meterToPixelScale;
+}
+
+
 void DepthMap::setDepthMin(float min)
 {
     m_minDepth = min;
@@ -99,13 +113,19 @@ void DepthMap::setDepthMax(float max)
 }
 
 
+void DepthMap::setMeterToPixelScale(float scale)
+{
+    m_meterToPixelScale = scale;
+}
+
+
 ColorImage<float, ColorSpace::CS_GRAY> convertDepthToGray(const DepthMap& depthMap)
 {
     ColorImage<float, ColorSpace::CS_GRAY> cImg(depthMap.getWidth(), 
                                                 depthMap.getHeight());
     
     // Map depth values to gray values.
-    for (int i = 0; i < depthMap.size(); ++i)
+    for (unsigned int i = 0; i < depthMap.size(); ++i)
     {
         float depth = depthMap.getData()[i];
         // Keep value in range min, max.
