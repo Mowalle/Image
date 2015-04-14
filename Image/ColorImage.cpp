@@ -13,18 +13,14 @@ int ColorImage<unsigned char, C>::getNumberOfChannels(
     case ColorSpace::CS_HSV:
     case ColorSpace::CS_LAB:
         return 3;
-        break;
     case ColorSpace::CS_RGBA:
     case ColorSpace::CS_BGRA:
     case ColorSpace::CS_ARGB:
         return 4;
-        break;
     case ColorSpace::CS_GRAY:
         return 1;
-        break;
     default:
         return 0;
-        break;
     }
 }
 
@@ -40,18 +36,14 @@ int ColorImage<float, C>::getNumberOfChannels(
     case ColorSpace::CS_HSV:
     case ColorSpace::CS_LAB:
         return 3;
-        break;
     case ColorSpace::CS_RGBA:
     case ColorSpace::CS_BGRA:
     case ColorSpace::CS_ARGB:
         return 4;
-        break;
     case ColorSpace::CS_GRAY:
         return 1;
-        break;
     default:
         return 0;
-        break;
     }
 }
 
@@ -66,18 +58,14 @@ int ColorImage<unsigned char, C>::getCvType(const ColorSpace colorSpace)
     case ColorSpace::CS_HSV:
     case ColorSpace::CS_LAB:
         return CV_8UC3;
-        break;
     case ColorSpace::CS_RGBA:
     case ColorSpace::CS_BGRA:
     case ColorSpace::CS_ARGB:
         return CV_8UC4;
-        break;
     case ColorSpace::CS_GRAY:
         return CV_8UC1;
-        break;
     default:
         return 0;
-        break;
     }
 }
 
@@ -92,18 +80,14 @@ int ColorImage<float, C>::getCvType(const ColorSpace colorSpace)
     case ColorSpace::CS_HSV:
     case ColorSpace::CS_LAB:
         return CV_32FC3;
-        break;
     case ColorSpace::CS_RGBA:
     case ColorSpace::CS_BGRA:
     case ColorSpace::CS_ARGB:
         return CV_32FC4;
-        break;
     case ColorSpace::CS_GRAY:
         return CV_32FC1;
-        break;
     default:
         return 0;
-        break;
     }
 }
 
@@ -196,7 +180,7 @@ bool ColorImage<unsigned char, C>::read(const std::string& fileName)
     // Replaced the old C-directives (may be slower).
     dummy.open(fileName);
 
-    bool throwsError = false;
+    bool throwsError;
     if (!dummy.is_open())
     {
         std::cerr << "ERROR: Could not open or find file " << fileName << "." << std::endl;
@@ -222,11 +206,12 @@ bool ColorImage<float, C>::read(const std::string& fileName)
 {
     // Create dummy file and check for success before trying to read image.
     std::ifstream dummy;
+    
     // Opening dummy file to check if it exists at all.
     // Replaced the old C-directives (may be slower).
     dummy.open(fileName);
 
-    bool throwsError = false;
+    bool throwsError;
     if (!dummy.is_open())
     {
         std::cerr << "ERROR: Could not open or find file " << fileName << "." << std::endl;
@@ -241,10 +226,10 @@ bool ColorImage<float, C>::read(const std::string& fileName)
         // special conversion if image is in HSV- or Lab-Space
         if (!throwsError && C == ColorSpace::CS_HSV)
         {
-            ColorImage::convertToHsv();
+            convertToHsv();
         }
         else if (!throwsError && C == ColorSpace::CS_LAB)
-            ColorImage::convertToLab();
+            convertToLab();
     }
     return throwsError;
 }
@@ -358,9 +343,8 @@ void ColorImage<unsigned char, C>::convertColorSpace(ColorImage<unsigned char, D
         else if (output->m_channels == 1)
         {
             // Calculate average color value and assign it.
-            float averageColor = 0;
             // TODO: Other weights (luminosity etc.) instead of just average color.
-            averageColor = (m_data[B(i)] + m_data[G(i)] + m_data[R(i)]) / 3.0f;
+            float averageColor = (m_data[B(i)] + m_data[G(i)] + m_data[R(i)]) / 3.0f;
             unsigned char avgColor = static_cast<unsigned char>(averageColor);
             output->setPixelColor(i, avgColor, avgColor, avgColor);
         }
@@ -1348,10 +1332,10 @@ bool ColorImage<float, C>::readCv(const std::string& fileName)
     m_data.resize(m_width * m_height * m_channels);
 
     unsigned char* data = cvImage.data;
-    // TODO(Ralf): Was needed before, now it reads them incorrectly if this is enabled?
+    // TODO: Was needed before, now it reads them incorrectly if this is enabled?
     //// step alignment into next scan line
     // int step = static_cast<int>(cvImage.step);
-
+    
     for (unsigned i = 0; i < size(); ++i)
     {
         // BUG: Not actually a bug, but unnecessary: we pass some values

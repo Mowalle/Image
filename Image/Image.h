@@ -1,8 +1,6 @@
 #pragma once
 
-#include<iostream>
-#include<string>
-#include<vector>
+#include <vector>
 
 template<typename T>
 class Image 
