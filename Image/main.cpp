@@ -1,11 +1,11 @@
-#include "DepthMap.h"
-#include "ColorImage.h"
+#include "DepthMap.hpp"
+#include "ColorImage.hpp"
 
 int main(int argc, char** argv)
 {
 
-    //ColorImage<float, ColorSpace::CS_RGB> fImage("Test.jpeg");
-    //ColorImage<float, ColorSpace::CS_LAB> hsvImage;
+    //ColorImage<float, ColorSpace::RGB> fImage("Test.jpeg");
+    //ColorImage<float, ColorSpace::LAB> hsvImage;
 
     //const clock_t startTime = clock();
 
@@ -20,7 +20,7 @@ int main(int argc, char** argv)
 
     //dmp.read("Bla.dat");
 
-    //ColorImage<float, ColorSpace::CS_GRAY> grayImg = convertDepthToGray(dmp);
+    //ColorImage<float, ColorSpace::GRAY> grayImg = convertDepthToGray(dmp);
 
     //grayImg.write("DepthGray.png");
 
@@ -30,16 +30,22 @@ int main(int argc, char** argv)
     //          << std::endl;
 
 
-    DepthMap dMap;
+    /*auto dMap = DepthMap{};
 	dMap.setDepthMin(0.0f);
 	dMap.setDepthMax(5.0f);
 
     dMap.read("D:\\rmorawe\\Personal Documents\\HiWi\\Depth Image Example Data\\depthMap_0750.dmp");
-	dMap.write("C:\\Users\\rmorawe\\Desktop\\Test.dat");
+	dMap.write("C:\\Users\\rmorawe\\Desktop\\Test.dat");*/
 
+    auto cImg = ColorImage<float, ColorSpace::RGBA>{};
+    cImg.read("Test.png");
+    cImg.write("TestResult.png");
 
-    auto grayImg = convertDepthToGray(dMap);
-    grayImg.write("TestGrayNew.png");
+    auto cImg2 = ColorImage<unsigned char, ColorSpace::RGBA>{};
+
+    cImg.convertType(&cImg2);
+
+    cImg2.write("TestResultConversion.png");
 
     return 0;
 }

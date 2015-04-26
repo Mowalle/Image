@@ -1,4 +1,8 @@
-#include "DepthMap.h"
+#include "DepthMap.hpp"
+
+#include <iostream>
+#include <fstream>
+#include <string>
 
 DepthMap::DepthMap() : m_minDepth(0), m_maxDepth(1.0f), m_meterToPixelScale(0)
 {}
@@ -68,9 +72,9 @@ void DepthMap::write(const std::string& fileName) const
     // Using reinterpret_cast insted of plain C-Cast.
     outfile.write(reinterpret_cast<char*>(&placeholder),
                   sizeof(int));
-    outfile.write(reinterpret_cast<char*>(const_cast<unsigned*>(&m_width)),
+    outfile.write(reinterpret_cast<char*>(const_cast<int*>(&m_width)),
                   sizeof(m_width));
-    outfile.write(reinterpret_cast<char*>(const_cast<unsigned*>(&m_height)),
+    outfile.write(reinterpret_cast<char*>(const_cast<int*>(&m_height)),
                   sizeof(m_height));
     outfile.write(reinterpret_cast<char*>(&placeholder),
                   sizeof(int)); // TODO: Implement scale
@@ -119,24 +123,24 @@ void DepthMap::setMeterToPixelScale(float scale)
 }
 
 
-ColorImage<float, ColorSpace::CS_GRAY> convertDepthToGray(const DepthMap& depthMap)
-{
-    ColorImage<float, ColorSpace::CS_GRAY> cImg(depthMap.getWidth(), 
-                                                depthMap.getHeight());
-    
-    // Map depth values to gray values.
-    for (unsigned int i = 0; i < depthMap.size(); ++i)
-    {
-        float depth = depthMap.getData()[i];
-        // Keep value in range min, max.
-        depth = std::max(depthMap.getDepthMin(), depth);
-        depth = std::min(depthMap.getDepthMax(), depth);
-
-        // Actual mapping. 
-        depth = 1 - (depth - depthMap.getDepthMin()) / (depthMap.getDepthMax() - depthMap.getDepthMin());
-        
-        // Keep in float range. Just in case.
-        cImg.getData()[i] = std::max(0.0f, std::min(depth, 1.0f));
-    }
-    return cImg;
-}
+//ColorImage<float, ColorSpace::GRAY> convertDepthToGray(const DepthMap& depthMap)
+//{
+//    ColorImage<float, ColorSpace::GRAY> cImg(depthMap.getWidth(), 
+//                                                depthMap.getHeight());
+//    
+//    // Map depth values to gray values.
+//    for (unsigned int i = 0; i < depthMap.size(); ++i)
+//    {
+//        float depth = depthMap.getData()[i];
+//        // Keep value in range min, max.
+//        depth = std::max(depthMap.getDepthMin(), depth);
+//        depth = std::min(depthMap.getDepthMax(), depth);
+//
+//        // Actual mapping. 
+//        depth = 1 - (depth - depthMap.getDepthMin()) / (depthMap.getDepthMax() - depthMap.getDepthMin());
+//        
+//        // Keep in float range. Just in case.
+//        cImg.getData()[i] = std::max(0.0f, std::min(depth, 1.0f));
+//    }
+//    return cImg;
+//}

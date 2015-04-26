@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Image.h"
-#include "ColorImage.h"
+#include "Image.hpp"
+#include "ColorImage.hpp"
 
 
 class DepthMap : public Image<float>
@@ -28,4 +28,4 @@ private:
 };
 
 
-ColorImage<float, ColorSpace::CS_GRAY> convertDepthToGray(const DepthMap& depthMap);
+ColorImage<float, ColorSpace::GRAY> convertDepthToGray(const DepthMap& depthMap);

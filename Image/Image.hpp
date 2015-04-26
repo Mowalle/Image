@@ -2,7 +2,7 @@
 
 #include <vector>
 
-template<typename T>
+template <class T>
 class Image 
 {
 public :
@@ -15,18 +15,21 @@ public :
     
     virtual bool read(const std::string& fileName) = 0;
     virtual void write(const std::string& fileName) const = 0;
-        
-    unsigned int size() const;
+    virtual void resize(int width, int height);
+    int size() const;
 
     // Getter
     std::vector<T>& getData();  // For manipulating the data afterwards.
     const std::vector<T>& getData() const;
-    unsigned int getWidth()  const;
-    unsigned int getHeight() const;
+    int getWidth()  const;
+    int getHeight() const;
+
+    void setWidth(int width);
+    void setHeight(int height);
 
 protected :
-    unsigned int m_width;
-    unsigned int m_height;
+    int m_width;
+    int m_height;
     std::vector<T> m_data;
 };
 

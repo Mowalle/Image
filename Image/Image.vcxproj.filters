@@ -15,16 +15,16 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Image.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ColorImage.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="IntegralImage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DepthMap.h">
+    <ClInclude Include="ColorImage.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DepthMap.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Image.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
