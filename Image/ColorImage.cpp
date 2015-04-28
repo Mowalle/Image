@@ -171,7 +171,7 @@ void ColorImage<T, C>::convertColorSpace(ColorImage<T, D>* output) const
         return;
     }
 
-    for (unsigned i = 0; i < size(); ++i)
+    for (int i = 0; i < size(); ++i)
     {
         // if both images have alpha
         if (m_channels == 4 && output->m_channels == 4)
@@ -285,7 +285,7 @@ template <class T, ColorSpace C>
 void ColorImage<T, C>::setToColor(T r, T g, T b)
 {
     auto alpha = std::is_same<T, unsigned char>::value ? 255 : 1.0; // This is more or less hardcoded, but no partial specialization needed.
-    for (unsigned i = 0; i < size(); ++i)
+    for (int i = 0; i < size(); ++i)
         setPixelColor(i, r, g, b, alpha);
 }
 
@@ -293,7 +293,7 @@ void ColorImage<T, C>::setToColor(T r, T g, T b)
 template <class T, ColorSpace C>
 void ColorImage<T, C>::setToColor(T r, T g, T b, T a)
 {
-    for (unsigned i = 0; i < size(); ++i)
+    for (int i = 0; i < size(); ++i)
         setPixelColor(i, r, g, b, a);
 }
 
@@ -407,28 +407,28 @@ int ColorImage<T, C>::getChannels() const
 
 
 template <class T, ColorSpace C>
-unsigned ColorImage<T, C>::getOffsetR() const
+int ColorImage<T, C>::getOffsetR() const
 {
     return m_offsetR;
 }
 
 
 template <class T, ColorSpace C>
-unsigned ColorImage<T, C>::getOffsetG() const
+int ColorImage<T, C>::getOffsetG() const
 {
     return m_offsetG;
 }
 
 
 template <class T, ColorSpace C>
-unsigned ColorImage<T, C>::getOffsetB() const
+int ColorImage<T, C>::getOffsetB() const
 {
     return m_offsetB;
 }
 
 
 template <class T, ColorSpace C>
-unsigned ColorImage<T, C>::getOffsetA() const
+int ColorImage<T, C>::getOffsetA() const
 {
     return m_offsetA;
 }
@@ -468,7 +468,7 @@ void ColorImage<T, C>::convertFromHsv()
     auto factor = getColorValueFactor(T(), float());
     auto factorInv = getColorValueFactor(float(), T());
 
-    for (unsigned i = 0; i < m_width * m_height; ++i)
+    for (int i = 0; i < m_width * m_height; ++i)
     {
         // Conversion function expects hue in range [0,360] and s,v [0,1].
         convertColorFromHsv(m_data[H(i)] * hueScale,

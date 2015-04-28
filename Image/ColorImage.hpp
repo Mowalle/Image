@@ -104,17 +104,17 @@ public:
 
     // Getters
     int getChannels() const;
-    unsigned int getOffsetR() const;
-    unsigned int getOffsetG() const;
-    unsigned int getOffsetB() const;
-    unsigned int getOffsetA() const;
+    int getOffsetR() const;
+    int getOffsetG() const;
+    int getOffsetB() const;
+    int getOffsetA() const;
 
 private:
     int m_channels;
-    unsigned int m_offsetR;
-    unsigned int m_offsetG;
-    unsigned int m_offsetB;
-    unsigned int m_offsetA;
+    int m_offsetR;
+    int m_offsetG;
+    int m_offsetB;
+    int m_offsetA;
 
     void convertToHsv();
     void convertFromHsv();
