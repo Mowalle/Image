@@ -125,24 +125,42 @@ void ColorImage<T, C>::write(const std::string& fileName) const
         return;
     }
 
-    std::vector<T> data(size() * m_channels);
-
+    std::vector<T> data;
     auto factor = getColorValueFactor(T(), uc());
-    // Convert to BGRA-space for OpenCV.
-    for (int i = 0; i < size(); ++i)
+    
+    if (C != ColorSpace::HSV)
     {
-        // For 1 channel outside if, because grey-channel values
-        // are the same in each channel; does not matter which to copy.
-        data[(i * m_channels)] = m_data[B(i)] * factor;
-        if (m_channels >= 3)
-        {
-            data[(i * m_channels) + 1] = m_data[G(i)] * factor;
-            data[(i * m_channels) + 2] = m_data[R(i)] * factor;
-        }
-        if (m_channels == 4)
-            data[(i * m_channels) + 3] = m_data[A(i)] * factor;
-    }
+        data.resize(size() * m_channels);
 
+        // Convert to BGRA-space for OpenCV.
+        for (int i = 0; i < size(); ++i)
+        {
+            // For 1 channel outside if, because grey-channel values
+            // are the same in each channel; does not matter which to copy.
+            data[(i * m_channels)] = m_data[B(i)] * factor;
+            if (m_channels >= 3)
+            {
+                data[(i * m_channels) + 1] = m_data[G(i)] * factor;
+                data[(i * m_channels) + 2] = m_data[R(i)] * factor;
+            }
+            if (m_channels == 4)
+                data[(i * m_channels) + 3] = m_data[A(i)] * factor;
+        }
+    }
+    else 
+    { // Special case: Colour Space is HSV -> does not need re-ordering of values
+        if (std::is_same<T, unsigned char>::value)
+        {
+            data = m_data;
+        }
+        else
+        { // scale floats accordingly
+            data.resize(size() * m_channels);
+            for (int i = 0; i < size() * m_channels; ++i)
+                data[i] = m_data[i] * factor;
+        }
+    }
+        
     cv::Mat output(m_height, m_width, getCvType(), data.data());
     cv::imwrite(fileName, output);
 }
@@ -441,6 +459,8 @@ void ColorImage<T, C>::convertToHsv()
     float h, s, v;
     auto factor = getColorValueFactor(T(), float());
     auto factorInv = getColorValueFactor(float(), T());
+    auto hueScale = std::is_same<T, unsigned char>::value ? 2 : 360.0; // This is more or less hardcoded, but no partial specialization needed.
+
     for (int i = 0; i < size(); ++i)
     {
         convertColorToHsv(m_data[R(i)] * factor, // Since conversion-function
@@ -451,7 +471,7 @@ void ColorImage<T, C>::convertToHsv()
         // saturation and value shall be in range [0,255] / [0, 1], and hue in
         // range [0,180] / [0, 360] (because unsigned char cannot go to 360)
         // this follows the OpenCV-convention for HSV.
-        m_data[R(i)] = static_cast<T>(h / 2);
+        m_data[R(i)] = static_cast<T>(h / hueScale);
         m_data[G(i)] = static_cast<T>(s * factorInv);
         m_data[B(i)] = static_cast<T>(v * factorInv);
     }
@@ -462,9 +482,9 @@ template <class T, ColorSpace C>
 void ColorImage<T, C>::convertFromHsv()
 {
     float r, g, b;
-    auto hueScale = std::is_same<T, uc>::value ? 2 : 1.0; // This is more or less hardcoded, but no partial specialization needed.
     auto factor = getColorValueFactor(T(), float());
     auto factorInv = getColorValueFactor(float(), T());
+    auto hueScale = std::is_same<T, uc>::value ? 2 : 360.0; // This is more or less hardcoded, but no partial specialization needed.
 
     for (int i = 0; i < m_width * m_height; ++i)
     {
@@ -484,11 +504,11 @@ void ColorImage<T, C>::convertFromHsv()
 
 template <class T, ColorSpace C>
 void ColorImage<T, C>::convertColorToHsv(float  r,
-                                        float  g,
-                                        float  b,
-                                        float* h,
-                                        float* s,
-                                        float* v)
+                                         float  g,
+                                         float  b,
+                                         float* h,
+                                         float* s,
+                                         float* v)
 {
     // This code is based on Daniel Mohr's version, which again is based on the
     // approach presented in Computer Graphics: Principles and Practive. Foley

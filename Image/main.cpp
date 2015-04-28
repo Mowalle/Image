@@ -1,48 +1,33 @@
 #include "DepthMap.hpp"
 #include "ColorImage.hpp"
 
+#include <opencv2\imgproc\imgproc.hpp>
+
 int main(int argc, char** argv)
 {
+    auto hsvF = ColorImage<float, ColorSpace::HSV>{};
+    auto hsvUC = ColorImage<uc, ColorSpace::HSV>{};
+    auto bgrF = ColorImage<float, ColorSpace::BGR>{};
+    auto bgrUC = ColorImage<uc, ColorSpace::BGR>{};
 
-    //ColorImage<float, ColorSpace::RGB> fImage("Test.jpeg");
-    //ColorImage<float, ColorSpace::LAB> hsvImage;
+    hsvF.read("Test.jpg");
+    hsvF.convertColorSpace(&bgrF);
+    hsvF.write("TestHSV_F.png");
+    bgrF.write("TestBGR_F.png");
 
-    //const clock_t startTime = clock();
+    hsvUC.read("Test.jpg");
+    hsvUC.convertColorSpace(&bgrUC);
+    hsvUC.write("TestHSV_UC.png");
+    bgrUC.write("TestBGR_UC.png");
 
-    //fImage.convertColorSpace(&hsvImage);
+    // OpenCV for comparison
+    auto test = cv::imread("Test.jpg", CV_LOAD_IMAGE_UNCHANGED);
+    cv::imwrite("TestBGR_CV_UC.png", test);
+    auto testHsv = cv::Mat{};
+    cv::cvtColor(test, testHsv, CV_BGR2HSV);
+    cv::imwrite("TestHSV_CV_UC.png", testHsv);
 
-    //std::clog << float(clock() - startTime) / CLOCKS_PER_SEC << std::endl;
-
-    //hsvImage.write("TestConvert.png");
-    //fImage.write("TestUnconverted.png");
-
-    //DepthMap dmp;
-
-    //dmp.read("Bla.dat");
-
-    //ColorImage<float, ColorSpace::GRAY> grayImg = convertDepthToGray(dmp);
-
-    //grayImg.write("DepthGray.png");
-
-    //std::cout << "\n----------"
-    //             "\nend main()"
-    //             "\n----------" 
-    //          << std::endl;
-
-
-    /*auto dMap = DepthMap{};
-	dMap.setDepthMin(0.0f);
-	dMap.setDepthMax(5.0f);
-
-    dMap.read("D:\\rmorawe\\Personal Documents\\HiWi\\Depth Image Example Data\\depthMap_0750.dmp");
-	dMap.write("C:\\Users\\rmorawe\\Desktop\\Test.dat");*/
-
-    auto cImg = ColorImage<unsigned char, ColorSpace::RGBA>{};
-    cImg.read("Test.png");
-    cImg.write("TestResult.png");
-
-    auto cImg2 = ColorImage<unsigned char, ColorSpace::RGB>{};
-    cImg.convertColorSpace(&cImg2);
+    std::vector<uc> v { testHsv.data, testHsv.data + testHsv.size().width * test.size().height };
 
     return 0;
 }
