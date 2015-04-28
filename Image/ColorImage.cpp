@@ -171,6 +171,7 @@ void ColorImage<T, C>::convertColorSpace(ColorImage<T, D>* output) const
         return;
     }
 
+    auto alpha = std::is_same<T, unsigned char>::value ? 255 : 1.0; // This is more or less hardcoded, but no partial specialization needed.
     for (int i = 0; i < size(); ++i)
     {
         // if both images have alpha
@@ -191,15 +192,12 @@ void ColorImage<T, C>::convertColorSpace(ColorImage<T, D>* output) const
             // TODO: Other weights (luminosity etc.) instead of just average color.
             auto averageColor = (m_data[B(i)] + m_data[G(i)] + m_data[R(i)]) / 3.0f;
             auto color = static_cast<T>(averageColor);
-            output->setPixelColor(i,
-                                  color,
-                                  color,
-                                  color);
+            output->setPixelColor(i, color, color, color, alpha);
         }
-        // else copy color values in new order, but omit alpha or set to default value
+        // else copy color values in new order, but set alpha to default value
         else
         {
-            output->setPixelColor(i, m_data[R(i)], m_data[G(i)], m_data[B(i)]);
+            output->setPixelColor(i, m_data[R(i)], m_data[G(i)], m_data[B(i)], alpha);
         }
     }
 
@@ -732,7 +730,6 @@ bool ColorImage<T, C>::readCv(const std::string& fileName)
     m_data.resize(m_width * m_height * m_channels);
 
     auto data = cvImage.data;
-
     auto factor = getColorValueFactor(unsigned char(), T());
     for (int i = 0; i < size(); ++i)
     {

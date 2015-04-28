@@ -37,15 +37,12 @@ int main(int argc, char** argv)
     dMap.read("D:\\rmorawe\\Personal Documents\\HiWi\\Depth Image Example Data\\depthMap_0750.dmp");
 	dMap.write("C:\\Users\\rmorawe\\Desktop\\Test.dat");*/
 
-    auto cImg = ColorImage<float, ColorSpace::RGBA>{};
+    auto cImg = ColorImage<unsigned char, ColorSpace::RGBA>{};
     cImg.read("Test.png");
     cImg.write("TestResult.png");
 
-    auto cImg2 = ColorImage<unsigned char, ColorSpace::RGBA>{};
-
-    cImg.convertType(&cImg2);
-
-    cImg2.write("TestResultConversion.png");
+    auto cImg2 = ColorImage<unsigned char, ColorSpace::RGB>{};
+    cImg.convertColorSpace(&cImg2);
 
     return 0;
 }
