@@ -74,13 +74,13 @@ int ColorImage<T, C>::getCvType()
     case ColorSpace::BGR:
     case ColorSpace::HSV:
     case ColorSpace::LAB:
-        return std::is_same<T, unsigned char>::value ? CV_8UC3 : CV_32FC3;
+        return std::is_same<T, uc>::value ? CV_8UC3 : CV_32FC3;
     case ColorSpace::RGBA:
     case ColorSpace::BGRA:
     case ColorSpace::ARGB:
-        return std::is_same<T, unsigned char>::value ? CV_8UC4 : CV_32FC4;
+        return std::is_same<T, uc>::value ? CV_8UC4 : CV_32FC4;
     case ColorSpace::GRAY:
-        return std::is_same<T, unsigned char>::value ? CV_8UC1 : CV_32FC1;
+        return std::is_same<T, uc>::value ? CV_8UC1 : CV_32FC1;
     default:
         return 0;
     }
@@ -127,7 +127,7 @@ void ColorImage<T, C>::write(const std::string& fileName) const
 
     std::vector<T> data(size() * m_channels);
 
-    auto factor = getColorValueFactor(T(), unsigned char());
+    auto factor = getColorValueFactor(T(), uc());
     // Convert to BGRA-space for OpenCV.
     for (int i = 0; i < size(); ++i)
     {
@@ -171,7 +171,7 @@ void ColorImage<T, C>::convertColorSpace(ColorImage<T, D>* output) const
         return;
     }
 
-    auto alpha = std::is_same<T, unsigned char>::value ? 255 : 1.0; // This is more or less hardcoded, but no partial specialization needed.
+    auto alpha = std::is_same<T, uc>::value ? 255 : 1.0; // This is more or less hardcoded, but no partial specialization needed.
     for (int i = 0; i < size(); ++i)
     {
         // if both images have alpha
@@ -282,7 +282,7 @@ void ColorImage<T, C>::setToValue(T value)
 template <class T, ColorSpace C>
 void ColorImage<T, C>::setToColor(T r, T g, T b)
 {
-    auto alpha = std::is_same<T, unsigned char>::value ? 255 : 1.0; // This is more or less hardcoded, but no partial specialization needed.
+    auto alpha = std::is_same<T, uc>::value ? 255 : 1.0; // This is more or less hardcoded, but no partial specialization needed.
     for (int i = 0; i < size(); ++i)
         setPixelColor(i, r, g, b, alpha);
 }
@@ -462,7 +462,7 @@ template <class T, ColorSpace C>
 void ColorImage<T, C>::convertFromHsv()
 {
     float r, g, b;
-    auto hueScale = std::is_same<T, unsigned char>::value ? 2 : 1.0; // This is more or less hardcoded, but no partial specialization needed.
+    auto hueScale = std::is_same<T, uc>::value ? 2 : 1.0; // This is more or less hardcoded, but no partial specialization needed.
     auto factor = getColorValueFactor(T(), float());
     auto factorInv = getColorValueFactor(float(), T());
 
@@ -730,7 +730,7 @@ bool ColorImage<T, C>::readCv(const std::string& fileName)
     m_data.resize(m_width * m_height * m_channels);
 
     auto data = cvImage.data;
-    auto factor = getColorValueFactor(unsigned char(), T());
+    auto factor = getColorValueFactor(uc(), T());
     for (int i = 0; i < size(); ++i)
     {
         // BUG: Not actually a bug, but unnecessary: we pass some values

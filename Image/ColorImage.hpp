@@ -27,24 +27,27 @@ enum class ColorSpace
 };
 
 
+using uc = unsigned char;
+
+
 template <class T, ColorSpace C>
 class ColorImage : public Image<T>
 {
     // FIX: This is pretty much hardcoded, but avoids partial specialization of entire class
     // and thus a lot of code duplication. If there are other ways to do this, fixes welcome.
     static_assert(std::is_same<T, float>::value || 
-                  std::is_same<T, unsigned char>::value,
+                  std::is_same<T, uc>::value,
                   "ColorImage only accepts float and unsigned char as first template parameter!");
 
     
-    friend class ColorImage<unsigned char, ColorSpace::GRAY>;
-    friend class ColorImage<unsigned char, ColorSpace::RGB>;
-    friend class ColorImage<unsigned char, ColorSpace::BGR>;
-    friend class ColorImage<unsigned char, ColorSpace::HSV>;
-    friend class ColorImage<unsigned char, ColorSpace::LAB>;
-    friend class ColorImage<unsigned char, ColorSpace::RGBA>;
-    friend class ColorImage<unsigned char, ColorSpace::BGRA>;
-    friend class ColorImage<unsigned char, ColorSpace::ARGB>;
+    friend class ColorImage<uc, ColorSpace::GRAY>;
+    friend class ColorImage<uc, ColorSpace::RGB>;
+    friend class ColorImage<uc, ColorSpace::BGR>;
+    friend class ColorImage<uc, ColorSpace::HSV>;
+    friend class ColorImage<uc, ColorSpace::LAB>;
+    friend class ColorImage<uc, ColorSpace::RGBA>;
+    friend class ColorImage<uc, ColorSpace::BGRA>;
+    friend class ColorImage<uc, ColorSpace::ARGB>;
     friend class ColorImage<float, ColorSpace::GRAY>;
     friend class ColorImage<float, ColorSpace::RGB>;
     friend class ColorImage<float, ColorSpace::BGR>;
@@ -132,13 +135,13 @@ private:
     }
 
     template<>
-    static float getColorValueFactor(unsigned char, float)
+    static float getColorValueFactor(uc, float)
     {
         return 1 / 255.0f;
     }
 
     template<>
-    static unsigned char getColorValueFactor(float, unsigned char)
+    static uc getColorValueFactor(float, uc)
     {
         return 255;
     }
