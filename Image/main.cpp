@@ -14,8 +14,12 @@ int main(int argc, char** argv)
     hsvF.convertColorSpace(&bgrF);
     hsvF.write("TestHSV_F.png");
     bgrF.write("TestBGR_F.png");
-
+    
     hsvUC.read("Test.jpg");
+    const unsigned char &h = hsvUC.getData()[3708];
+    const unsigned char &s = hsvUC.getData()[3709];
+    const unsigned char &v = hsvUC.getData()[3710];
+
     hsvUC.convertColorSpace(&bgrUC);
     hsvUC.write("TestHSV_UC.png");
     bgrUC.write("TestBGR_UC.png");
@@ -26,8 +30,6 @@ int main(int argc, char** argv)
     auto testHsv = cv::Mat{};
     cv::cvtColor(test, testHsv, CV_BGR2HSV);
     cv::imwrite("TestHSV_CV_UC.png", testHsv);
-
-    std::vector<uc> v { testHsv.data, testHsv.data + testHsv.size().width * test.size().height };
 
     return 0;
 }

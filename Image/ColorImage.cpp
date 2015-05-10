@@ -516,6 +516,7 @@ void ColorImage<T, C>::convertColorToHsv(float  r,
     // Given: r, g, b, each in [0, 1].
     // Desired: h in [0, 360), s and v in [0, 1], except if s = 0,
     // then h = UNDEFINED. 
+
     float max = std::max(std::max(r, g), b);
     float min = std::min(std::min(r, g), b);
 
@@ -546,6 +547,10 @@ void ColorImage<T, C>::convertColorToHsv(float  r,
         *h *= 60.0f;
         if (*h < 0.0f)
             *h += 360.0f;
+
+        *h = std::ceil(*h); // to prevent rounding errors in edge cases, like h = 359.25 etc.
+        if (*h == 360)
+            *h = 0;
     }
 }
 
